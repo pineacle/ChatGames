@@ -1,0 +1,5 @@
+name: chatgames-api
+version: ${project.version}
+main: me.pineacle.chatgamesapi.ChatgamesApi
+api-version: 1.17
+authors: [ pineacle ]

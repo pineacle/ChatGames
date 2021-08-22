@@ -1,0 +1,8 @@
+name: ChatGames
+version: ${project.version}
+main: me.pineacle.chatgames.ChatGamesPlugin
+api-version: 1.17
+authors: [ pineacle ]
+softdepend:
+  - Vault
+description: Create interactive chat games that players can compete in.
