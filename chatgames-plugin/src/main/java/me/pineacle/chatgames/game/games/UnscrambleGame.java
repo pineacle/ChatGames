@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ExactGame extends Game {
+public class UnscrambleGame extends Game {
 
     private ChatGamesPlugin plugin;
     private File file;
     private FileConfiguration configuration;
     private GameManager gameManager;
 
-    public ExactGame(ChatGamesPlugin plugin) {
+    public UnscrambleGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder() + "/exact-game.yml");
+        this.file = new File(plugin.getDataFolder() + "/unscramble-game.yml");
         if (!file.exists())
-            plugin.saveResource("exact-game.yml", false);
+            plugin.saveResource("unscramble-game.yml", false);
         this.configuration = YamlConfiguration.loadConfiguration(file);
         this.gameManager = plugin.getGameManager();
     }
@@ -48,7 +48,7 @@ public class ExactGame extends Game {
 
         // load the questions and answers from the yml file
         List<Question> questions = new ArrayList<>();
-        configuration.getStringList("words").forEach(word -> questions.add(new Question(this, word, Collections.singletonList(word))));
+        configuration.getStringList("words").forEach(word -> questions.add(new Question(this, StringUtils.scramble(word), Collections.singletonList(word))));
 
         return questions;
 
@@ -71,7 +71,7 @@ public class ExactGame extends Game {
 
     @Override
     public String name() {
-        return "Exact";
+        return "Unscramble";
     }
 
     @Override

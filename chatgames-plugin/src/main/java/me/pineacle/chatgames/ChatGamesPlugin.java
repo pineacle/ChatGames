@@ -2,10 +2,11 @@ package me.pineacle.chatgames;
 
 import lombok.Getter;
 import me.pineacle.chatgames.API.IChatGames;
-import me.pineacle.chatgames.events.PluginLoadEvent;
+import me.pineacle.chatgames.commands.BaseCommand;
 import me.pineacle.chatgames.game.GameManager;
 import me.pineacle.chatgames.game.GameRegistry;
-import me.pineacle.chatgames.game.games.ExactGame;
+import me.pineacle.chatgames.listeners.ChatEvent;
+import me.pineacle.chatgames.storage.config.Config;
 import me.pineacle.chatgames.user.UserManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -14,60 +15,63 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
 
-    @Getter
-    private static ChatGamesPlugin instance;
+    /*
+    TODO: remove reward() from abstraction
+     */
 
-    @Getter
-    private Economy economy = null;
-    @Getter
-    private boolean usingVault = false;
+    @Getter private static ChatGamesPlugin instance;
 
-    @Getter
-    private UserManager userManager;
-    @Getter
-    private GameManager gameManager;
-    @Getter
-    private GameRegistry gameRegistry;
+    // vault
+    @Getter private Economy economy = null;
+    @Getter private boolean usingVault = false;
+
+    @Getter private UserManager userManager;
+    @Getter private GameManager gameManager;
+    @Getter private GameRegistry gameRegistry;
+    @Getter private Config gameConfig;
 
     @Override
     public void onEnable() {
         instance = this;
+
         userManager = new UserManager();
         gameManager = new GameManager(this);
         gameRegistry = new GameRegistry();
+        gameConfig = new Config(this);
 
-        registerProvidedGames();
+        loadGames();
+
+        saveDefaultConfig();
+
+        Bukkit.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
+        getCommand("chatgames").setExecutor(new BaseCommand(this));
 
         if (setupEconomy()) usingVault = true;
 
-        Bukkit.getServer().getPluginManager().callEvent(new PluginLoadEvent(this));
-
+        gameManager.startGames();
     }
 
     @Override
     public void onDisable() {
+        gameManager.unload();
     }
 
 
-    private void registerProvidedGames() {
-
+    private void loadGames() {
+        gameManager.load();
     }
+
 
     private boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
+        if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
+        if (rsp == null) return false;
         economy = rsp.getProvider();
+        getLogger().info("Vault found, enabling Vault integration.");
         return true;
     }
 

@@ -1,0 +1,36 @@
+case-sensitive: false
+
+format:
+  - " "
+  - "&6&lCHAT GAME: &7Unscramble &f{question}&7!"
+  - " "
+
+expires: 15 # seconds
+expired-format:
+  - " "
+  - "&cNobody got the answer: &7{answer}"
+  - " "
+
+reward-pool:
+  '1':
+    amount: 25000 # requires vault
+    commands: # available placeholders: {msg} | {bc}
+      - '{msg}&aYou won the chat game and won &2&l$25,000'
+      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
+  '2':
+    amount: 50000 # requires vault
+    commands:
+      - '{msg}&aYou won the chat game and won &2&l$50,000'
+      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
+  '3':
+    amount: 75000 # requires vault
+    commands:
+      - '{msg}&aYou won the chat game and won &2&l$75,000'
+      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
+
+words:
+  - "SpigotMC"
+  - "Minecraft"
+  - "Red Sand"
+  - "Cobbled Deepslate"
+  - "Dark Oak Slab"

@@ -1,0 +1,21 @@
+settings:
+  language: en_US
+  version: 1 # recommended to not touch
+  use-mysql: false # uses SQLite if false
+  mysql: # use if 'use-mysql' is true
+    host: localhost
+    port: '3306'
+    database: chatgames
+    user: root
+    password: ''
+
+
+game:
+  required-players: 1
+  game-length: 60 # seconds
+  game-gap: 4 # in minutes, must be > than length
+  reward-pool: # used as a global reward pool if the reward pool in the <game>.yml is empty
+    '1':
+      amount: 25000 # requires vault
+      commands: # available placeholders: {msg} -> message player
+        - '{msg}&a{player}! You won $25,000!'

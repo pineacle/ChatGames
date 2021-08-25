@@ -4,6 +4,9 @@ import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.Question;
 import org.bukkit.event.Event;
 
+/**
+ * Base class for all ChatGame events
+ */
 public abstract class ChatGameEvent extends Event {
 
     protected Game game;
@@ -15,18 +18,14 @@ public abstract class ChatGameEvent extends Event {
     }
 
     /**
-     * Returns event game
-     *
-     * @return event game
+     * @return Current game.
      */
     public Game getGame() {
         return game;
     }
 
     /**
-     * Returns event question
-     *
-     * @return event question
+     * @return Question asked.
      */
     public Question getQuestion() {
         return question;

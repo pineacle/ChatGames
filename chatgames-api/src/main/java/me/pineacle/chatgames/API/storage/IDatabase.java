@@ -28,6 +28,9 @@ public interface IDatabase {
      */
     Connection getConnection() throws SQLException;
 
+    /**
+     * Secures connection to the database
+     */
     void connect();
 
 }

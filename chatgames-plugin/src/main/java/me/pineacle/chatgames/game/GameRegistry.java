@@ -1,21 +1,29 @@
 package me.pineacle.chatgames.game;
 
 import lombok.Getter;
-import me.pineacle.chatgames.API.game.IGame;
 
-import java.util.IdentityHashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class GameRegistry {
 
     public GameRegistry() {}
 
-    @Getter private IdentityHashMap<Class<? extends IGame>, IGame> map = new IdentityHashMap<>();
+    @Getter private Map<Class<? extends Game>, Game> map = new Hashtable<>();
 
-    public <S extends IGame> void register(S game) {
+    /**
+     * Registers the game.
+     * Only games registered will be in the game rotation.
+     */
+    public <S extends Game> void register(S game) {
         map.put(game.getClass(), game);
     }
 
-    public <S extends IGame> S get(Class<S> type) {
+    /**
+     * @param type Class of the game.
+     * @return Game in rotation.
+     */
+    public <S extends Game> S get(Class<S> type) {
         return type.cast(map.get(type));
     }
 

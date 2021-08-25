@@ -5,4 +5,9 @@ api-version: 1.17
 authors: [ pineacle ]
 softdepend:
   - Vault
+  - PlaceholderAPI
 description: Create interactive chat games that players can compete in.
+commands:
+  chatgames:
+    description: Base command for the plugin ChatGames
+    aliases: [cg, cgames]

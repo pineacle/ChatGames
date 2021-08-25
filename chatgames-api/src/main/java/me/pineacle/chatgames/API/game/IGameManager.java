@@ -1,10 +1,11 @@
 package me.pineacle.chatgames.API.game;
 
-public interface IGameManager {
+import java.util.Optional;
 
+public interface IGameManager<Game, Question> {
 
-    void register(IGame game);
+    void register(Game type);
 
-
+    void force(Game type, Optional<Question> question);
 
 }
