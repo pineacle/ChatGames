@@ -2,7 +2,8 @@ case-sensitive: true
 
 format:
   - " "
-  - "&6&lCHAT GAME: &7Type &f{question} &7exactly as it appears!"
+  - "{center}&6&lCHAT GAME"
+  - "{center}&7Type &f{question} &7exactly as it appears!"
   - " "
 
 expires: 15 # seconds

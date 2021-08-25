@@ -2,7 +2,8 @@ case-sensitive: false
 
 format:
   - " "
-  - "&6&lCHAT GAME: &7Unscramble &f{question}&7!"
+  - "{center}&6&lCHAT GAME"
+  - "{center}&7Unscramble &f{question}&7!"
   - " "
 
 expires: 15 # seconds

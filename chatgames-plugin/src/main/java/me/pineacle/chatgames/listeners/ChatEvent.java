@@ -44,58 +44,39 @@ public class ChatEvent implements Listener {
                 if (game.caseSensitive()) {
                     if (message.equals(questionAnswerEvent.getQuestion().getAnswers().get(0))) {
 
-                        plugin.sync(() -> Bukkit.getPluginManager().callEvent(questionAnswerEvent));
-                        if (questionAnswerEvent.isCancelled()) return;
-
-                        long start = gameManager.getQuestionTask().getStart();
-                        long finish = System.currentTimeMillis();
-                        long elapsed = finish - start;
-
-                        long millis = elapsed % 1000;
-                        long second = (elapsed / 1000) % 60;
-
-                        String elapsedString = second + "." + millis;
-
-                        questionAnswerEvent.getGame().reward(winner, Optional.of(elapsedString));
-
-                        gameManager.getQuestionTask().cancel();
-                        gameManager.setQuestionTask(null);
-
-
-                        e.setCancelled(true);
-
-
+                        handleCorrect(winner, e, questionAnswerEvent);
                     }
                 } else {
                     if (message.equalsIgnoreCase(questionAnswerEvent.getQuestion().getAnswers().get(0))) {
 
-                        plugin.sync(() -> Bukkit.getPluginManager().callEvent(questionAnswerEvent));
-                        if (questionAnswerEvent.isCancelled()) return;
-
-                        long start = gameManager.getQuestionTask().getStart();
-                        long finish = System.currentTimeMillis();
-                        long elapsed = finish - start;
-
-                        long millis = elapsed % 1000;
-                        long second = (elapsed / 1000) % 60;
-
-                        String elapsedString = second + "." + millis;
-
-                        questionAnswerEvent.getGame().reward(winner, Optional.of(elapsedString));
-
-                        gameManager.getQuestionTask().cancel();
-                        gameManager.setQuestionTask(null);
-
-
-                        e.setCancelled(true);
+                        handleCorrect(winner, e, questionAnswerEvent);
 
                     }
                 }
-
             }
         }
+    }
+
+    private void handleCorrect(Player winner, AsyncPlayerChatEvent e, QuestionAnswerEvent questionAnswerEvent) {
+        plugin.sync(() -> Bukkit.getPluginManager().callEvent(questionAnswerEvent));
+        if (questionAnswerEvent.isCancelled()) return;
+
+        long start = gameManager.getQuestionTask().getStart();
+        long finish = System.currentTimeMillis();
+        long elapsed = finish - start;
+
+        long millis = elapsed % 1000;
+        long second = (elapsed / 1000) % 60;
+
+        String elapsedString = second + "." + millis;
+
+        questionAnswerEvent.getGame().reward(winner, Optional.of(elapsedString));
+
+        gameManager.getQuestionTask().cancel();
+        gameManager.setQuestionTask(null);
 
 
+        e.setCancelled(true);
     }
 
 }

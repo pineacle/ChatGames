@@ -9,7 +9,6 @@ import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -36,9 +35,14 @@ public class QuestionTask extends BukkitRunnable {
     public void ask() {
         this.game.format(question)
                 .stream()
-                .map(s -> StringUtils.format(s))
+                .map(StringUtils::format)
                 .collect(Collectors.toList())
-                .forEach(line -> Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(line.replace("{question}", question.getQuestion()))));
+                .forEach(line -> Bukkit.getOnlinePlayers().forEach(player -> {
+                    if (line.startsWith("{center}"))
+                        StringUtils.sendCenteredMessage(player, line.replace("{question}", question.getQuestion()).replace("{center}", ""));
+                    else
+                        player.sendMessage(line.replace("{question}", question.getQuestion()).replace("{center}", ""));
+                }));
     }
 
     public void scheduleTimer() {
