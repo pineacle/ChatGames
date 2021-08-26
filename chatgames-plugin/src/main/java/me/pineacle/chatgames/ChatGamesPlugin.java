@@ -2,11 +2,12 @@ package me.pineacle.chatgames;
 
 import lombok.Getter;
 import me.pineacle.chatgames.API.IChatGames;
-import me.pineacle.chatgames.commands.BaseCommand;
+import me.pineacle.chatgames.commands.CommandHandler;
 import me.pineacle.chatgames.game.GameManager;
 import me.pineacle.chatgames.game.GameRegistry;
 import me.pineacle.chatgames.listeners.ChatEvent;
 import me.pineacle.chatgames.storage.config.Config;
+import me.pineacle.chatgames.storage.config.Language;
 import me.pineacle.chatgames.user.UserManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -31,7 +32,11 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
     @Getter private UserManager userManager;
     @Getter private GameManager gameManager;
     @Getter private GameRegistry gameRegistry;
+
+    @Getter private CommandHandler commandHandler;
+
     @Getter private Config gameConfig;
+    @Getter private Language language;
 
     @Getter private FileConfiguration words;
 
@@ -42,7 +47,9 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         userManager = new UserManager();
         gameManager = new GameManager(this);
         gameRegistry = new GameRegistry();
+
         gameConfig = new Config(this);
+        language = new Language(this, gameConfig);
 
         loadGames();
 
@@ -56,7 +63,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         saveDefaultConfig();
 
         Bukkit.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
-        getCommand("chatgames").setExecutor(new BaseCommand(this));
+        getCommand("chatgames").setExecutor(commandHandler = new CommandHandler(this));
 
         if (setupEconomy()) usingVault = true;
 

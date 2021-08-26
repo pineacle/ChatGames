@@ -9,7 +9,6 @@ import me.pineacle.chatgames.utils.Loadable;
 import me.pineacle.chatgames.utils.StringUtils;
 import me.pineacle.chatgames.utils.tasks.QuestionTask;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -79,6 +78,12 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
     public void stopGames() {
         gameSchedulerTask.cancel();
         gameSchedulerTask = null;
+
+        if (questionTask != null) {
+            questionTask.cancel();
+            questionTask = null;
+        }
+
     }
 
     /**
@@ -160,7 +165,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         Question currentQuestion = pickQuestion(Optional.of(currentGame));
 
         // stop the current question if active
-        if(questionTask!=null) {
+        if (questionTask != null) {
             questionTask.cancel();
             questionTask = null;
         }
