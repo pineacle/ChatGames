@@ -51,7 +51,7 @@ public class MathGame extends Game {
         List<Question> questionList = new ArrayList<>();
 
         // create 100 questions
-        for (int i = 0; i <= 100; i++) {
+        for (int i = 0; i <= 150; i++) {
             List<String> exp = equation();
             questionList.add(new Question(this, exp.get(0), Collections.singletonList(exp.get(1))));
         }
@@ -126,8 +126,8 @@ public class MathGame extends Game {
 
         char[] operators = {'+', '-', '*'};
 
-        int first = ThreadLocalRandom.current().nextInt(0, 50);
-        int second = ThreadLocalRandom.current().nextInt(0, 50);
+        int first = ThreadLocalRandom.current().nextInt(0, 100);
+        int second = ThreadLocalRandom.current().nextInt(0, 100);
 
         char operator = operators[ThreadLocalRandom.current().nextInt(2)];
 
