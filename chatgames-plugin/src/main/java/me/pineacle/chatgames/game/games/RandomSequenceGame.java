@@ -12,24 +12,22 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MathGame extends Game {
+public class RandomSequenceGame extends Game {
 
     private ChatGamesPlugin plugin;
     private File file;
     private FileConfiguration configuration;
     private GameManager gameManager;
 
-    public MathGame(ChatGamesPlugin plugin) {
+    public RandomSequenceGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder() + "/games/math-game.yml");
+        this.file = new File(plugin.getDataFolder() + "/games/randomsequence-game.yml");
         if (!file.exists())
-            plugin.saveResource("games/math-game.yml", false);
+            plugin.saveResource("games/randomsequence-game.yml", false);
         this.configuration = YamlConfiguration.loadConfiguration(file);
         this.gameManager = plugin.getGameManager();
     }
@@ -42,16 +40,16 @@ public class MathGame extends Game {
     // not necessary
     @Override
     public boolean caseSensitive() {
-        return false;
+        return configuration.getBoolean("case-sensitive");
     }
 
     @Override
     public List<Question> questions() {
 
         List<Question> questionList = new ArrayList<>();
-        List<String> exp = equation();
+        String sequence = sequence();
 
-        questionList.add(new Question(this, exp.get(0), Collections.singletonList(exp.get(1))));
+        questionList.add(new Question(this, sequence, Collections.singletonList(sequence)));
 
         return questionList;
 
@@ -118,38 +116,17 @@ public class MathGame extends Game {
                 .replace("{time}", elapsedTime.orElse("")));
     }
 
-    private List<String> equation() {
-        List<String> exp = new ArrayList<>();
+    private String sequence() {
+        char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 
-        char[] operators = {'+', '-', '*'};
+        int bound = ThreadLocalRandom.current().nextInt(configuration.getInt("lowest"), configuration.getInt("highest"));
 
-        int first = ThreadLocalRandom.current().nextInt(configuration.getInt("lowest"), configuration.getInt("highest"));
-        int second = ThreadLocalRandom.current().nextInt(configuration.getInt("lowest"), configuration.getInt("highest"));
-
-        char operator = operators[ThreadLocalRandom.current().nextInt(2)];
-
-        if (operator == '+') {
-
-            exp.add(first + " + " + second);
-            int answer = first + second;
-
-            exp.add(String.valueOf(answer));
-
-        } else if (operator == '*') {
-
-            exp.add(first + " * " + second);
-            int answer = first * second;
-
-            exp.add(String.valueOf(answer));
-
-        } else {
-
-            exp.add(first + " - " + second);
-            int answer = first - second;
-            exp.add(String.valueOf(answer));
-
+        StringBuilder sb = new StringBuilder(bound);
+        Random random = new Random();
+        for (int i = 0; i < bound; i++) {
+            char c = chars[random.nextInt(chars.length)];
+            sb.append(c);
         }
-        return exp;
+        return sb.toString().trim();
     }
-
 }

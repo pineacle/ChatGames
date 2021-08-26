@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.pineacle.chatgames.API.game.IGameManager;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.game.games.ExactGame;
-import me.pineacle.chatgames.game.games.MathGame;
-import me.pineacle.chatgames.game.games.ReverseGame;
-import me.pineacle.chatgames.game.games.UnscrambleGame;
+import me.pineacle.chatgames.game.games.*;
 import me.pineacle.chatgames.utils.Loadable;
 import me.pineacle.chatgames.utils.StringUtils;
 import me.pineacle.chatgames.utils.tasks.QuestionTask;
@@ -73,7 +70,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
             });
             questionTask.ask();
             questionTask.scheduleTimer();
-        }, 0L, /* plugin.getGameConfig().getConfiguration().getInt("game.game-gap") * 20 * 60 */ 500L  );
+        }, 0L, plugin.getGameConfig().getConfiguration().getInt("game.game-gap") * 20 * 60);
 
     }
 
@@ -97,7 +94,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         Game currentGame = gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size()));
 
         // pick random question from selected game
-        Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt( currentGame.questions().size()));
+        Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt(currentGame.questions().size()));
 
         // if repeat question, reroll
         if (!active.isEmpty() && active.containsValue(picked) || active.containsKey(currentGame)) {
@@ -140,6 +137,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         new UnscrambleGame(plugin).register();
         new ReverseGame(plugin).register();
         new MathGame(plugin).register();
+        new RandomSequenceGame(plugin).register();
 
         // log and load registered games
         plugin.getGameRegistry().getMap().forEach((clazz, game) -> {
@@ -157,6 +155,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
 
     @Override
     public void force(Game type, Optional<Question> question) {
-        // TODO
+        // stop active game and start it again. I'll probably improve this later
+        stopGames();
     }
 }

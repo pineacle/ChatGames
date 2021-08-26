@@ -29,7 +29,7 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
         if (!(sender instanceof Player)) {
 
             if (args.length == 0) {
-                plugin.getLogger().warning("Missing argument: /chatgames [enable/disable]");
+                plugin.getLogger().warning("Missing argument: /chatgames [enable/disable/force/current]");
                 return false;
             }
 
@@ -48,11 +48,12 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
             }
 
         } else {
+
             // is player
             Player player = (Player) sender;
 
             if (args.length == 0) {
-                player.sendMessage("§cMissing argument: /chatgames [enable/disable]");
+                player.sendMessage("§cMissing argument: /chatgames [enable/disable/force/current/toggle]");
                 return false;
             }
 

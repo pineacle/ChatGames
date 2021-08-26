@@ -6,6 +6,9 @@ format:
   - "{center}&7Type &f{question} &7exactly as it appears!"
   - " "
 
+lowest: 5 # lowest possible characters
+highest: 10 # highest possible characters
+
 expires: 15 # seconds
 expired-format:
   - " "
