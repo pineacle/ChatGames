@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class UnscrambleGame extends Game {
+public class MathGame extends Game {
 
     private ChatGamesPlugin plugin;
     private File file;
     private FileConfiguration configuration;
     private GameManager gameManager;
 
-    public UnscrambleGame(ChatGamesPlugin plugin) {
+    public MathGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder() + "/games/unscramble-game.yml");
+        this.file = new File(plugin.getDataFolder() + "/games/math-game.yml");
         if (!file.exists())
-            plugin.saveResource("games/unscramble-game.yml", false);
+            plugin.saveResource("games/math-game.yml", false);
         this.configuration = YamlConfiguration.loadConfiguration(file);
         this.gameManager = plugin.getGameManager();
     }
@@ -38,19 +38,25 @@ public class UnscrambleGame extends Game {
     Abstract Methods
      */
 
+
+    // not necessary
     @Override
     public boolean caseSensitive() {
-        return configuration.getBoolean("case-sensitive");
+        return false;
     }
 
     @Override
     public List<Question> questions() {
 
-        // load the questions and answers from the yml file
-        List<Question> questions = new ArrayList<>();
-        plugin.getWords().getStringList("words").forEach(word -> questions.add(new Question(this, StringUtils.scramble(word), Collections.singletonList(word))));
+        List<Question> questionList = new ArrayList<>();
 
-        return questions;
+        // create 100 questions
+        for (int i = 0; i <= 100; i++) {
+            List<String> exp = equation();
+            questionList.add(new Question(this, exp.get(0), Collections.singletonList(exp.get(1))));
+        }
+
+        return questionList;
 
     }
 
@@ -71,7 +77,7 @@ public class UnscrambleGame extends Game {
 
     @Override
     public String name() {
-        return "Unscramble";
+        return "Reverse";
     }
 
     @Override
@@ -113,6 +119,40 @@ public class UnscrambleGame extends Game {
                 .replace("{display_name}", winner.getDisplayName())
                 .replace("{answer}", gameManager.getActiveQuestion().getAnswers().get(0))
                 .replace("{time}", elapsedTime.orElse("")));
+    }
+
+    private List<String> equation() {
+        List<String> exp = new ArrayList<>();
+
+        char[] operators = {'+', '-', '*'};
+
+        int first = ThreadLocalRandom.current().nextInt(0, 50);
+        int second = ThreadLocalRandom.current().nextInt(0, 50);
+
+        char operator = operators[ThreadLocalRandom.current().nextInt(2)];
+
+        if (operator == '+') {
+
+            exp.add(first + " + " + second);
+            int answer = first + second;
+
+            exp.add(String.valueOf(answer));
+
+        } else if (operator == '*') {
+
+            exp.add(first + " * " + second);
+            int answer = first * second;
+
+            exp.add(String.valueOf(answer));
+
+        } else {
+
+            exp.add(first + " - " + second);
+            int answer = first - second;
+            exp.add(String.valueOf(answer));
+
+        }
+        return exp;
     }
 
 }

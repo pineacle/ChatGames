@@ -5,6 +5,8 @@ import lombok.Setter;
 import me.pineacle.chatgames.API.game.IGameManager;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.game.games.ExactGame;
+import me.pineacle.chatgames.game.games.MathGame;
+import me.pineacle.chatgames.game.games.ReverseGame;
 import me.pineacle.chatgames.game.games.UnscrambleGame;
 import me.pineacle.chatgames.utils.Loadable;
 import me.pineacle.chatgames.utils.StringUtils;
@@ -71,7 +73,7 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
             });
             questionTask.ask();
             questionTask.scheduleTimer();
-        }, 0L, plugin.getGameConfig().getConfiguration().getInt("game.game-gap") * 20 * 60  );
+        }, 0L, /* plugin.getGameConfig().getConfiguration().getInt("game.game-gap") * 20 * 60 */ 500L  );
 
     }
 
@@ -92,10 +94,10 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
     public Question pickQuestion() {
 
         // pick random game from game pool
-        Game currentGame = gamePool.get(ThreadLocalRandom.current().nextInt(0, gamePool.size()));
+        Game currentGame = gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size()));
 
         // pick random question from selected game
-        Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt(0, currentGame.questions().size()));
+        Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt( currentGame.questions().size()));
 
         // if repeat question, reroll
         if (!active.isEmpty() && active.containsValue(picked) || active.containsKey(currentGame)) {
@@ -136,6 +138,8 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         // provided games
         new ExactGame(plugin).register();
         new UnscrambleGame(plugin).register();
+        new ReverseGame(plugin).register();
+        new MathGame(plugin).register();
 
         // log and load registered games
         plugin.getGameRegistry().getMap().forEach((clazz, game) -> {

@@ -20,7 +20,7 @@
 
     <dependencies>
 
-        <!--    PAPER    -->
+        <!--    SPIGOT    -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>

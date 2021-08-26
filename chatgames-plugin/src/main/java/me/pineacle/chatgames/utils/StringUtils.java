@@ -28,6 +28,10 @@ public class StringUtils {
         return org.bukkit.ChatColor.translateAlternateColorCodes('&', string);
     }
 
+    public static String reverse(String word) {
+        return new StringBuilder(word).reverse().toString().trim();
+    }
+
     // https://stackoverflow.com/questions/20588736/how-can-i-shuffle-the-letters-of-a-word/20589105
     private static String scrambleWord(String word) {
 
@@ -36,7 +40,8 @@ public class StringUtils {
             l.add(c);
         Collections.shuffle(l); //shuffle the list
 
-        StringBuilder sb = new StringBuilder(); //now rebuild the word
+        StringBuffer sb = new StringBuffer();
+        //now rebuild the word
         for (char c : l)
             sb.append(c);
 

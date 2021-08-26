@@ -27,9 +27,9 @@ public class ExactGame extends Game {
 
     public ExactGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder() + "/exact-game.yml");
+        this.file = new File(plugin.getDataFolder() + "/games/exact-game.yml");
         if (!file.exists())
-            plugin.saveResource("exact-game.yml", false);
+            plugin.saveResource("games/exact-game.yml", false);
         this.configuration = YamlConfiguration.loadConfiguration(file);
         this.gameManager = plugin.getGameManager();
     }
@@ -48,7 +48,7 @@ public class ExactGame extends Game {
 
         // load the questions and answers from the yml file
         List<Question> questions = new ArrayList<>();
-        configuration.getStringList("words").forEach(word -> questions.add(new Question(this, word, Collections.singletonList(word))));
+        plugin.getWords().getStringList("words").forEach(word -> questions.add(new Question(this, word, Collections.singletonList(word))));
 
         return questions;
 
@@ -103,31 +103,6 @@ public class ExactGame extends Game {
             });
 
 
-        } else {
-
-            /*
-            Take from config.yml
-             */
-
-            ArrayList<String> rewards = new ArrayList<>();
-
-            plugin.getConfig().getConfigurationSection("reward-pool").getKeys(false).forEach(key -> {
-                if (plugin.isUsingVault())
-                    plugin.getEconomy().depositPlayer(winner, plugin.getConfig().getInt("reward-pool." + key + ".amount"));
-                rewards.add(key);
-            });
-
-            String reward = rewards.get(ThreadLocalRandom.current().nextInt(rewards.size() - 1));
-
-            plugin.getConfig().getStringList("reward-pool." + reward + ".commands").forEach(command -> {
-                if (command.startsWith("{msg}"))
-                    winner.sendMessage(replace(command, "{msg}", winner, elapsedTime));
-                else if (command.startsWith("{bc}"))
-                    Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(replace(command, "{bc}", winner, elapsedTime)));
-                else
-                    plugin.sync(() -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), replace(command, "{bc}", winner, elapsedTime)));
-
-            });
         }
 
     }

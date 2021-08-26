@@ -12,10 +12,4 @@ settings:
 
 game:
   required-players: 1
-  game-length: 60 # seconds
-  game-gap: 4 # in minutes, must be > than length
-  reward-pool: # used as a global reward pool if the reward pool in the <game>.yml is empty
-    '1':
-      amount: 25000 # requires vault
-      commands: # available placeholders: {msg} -> message player
-        - '{msg}&a{player}! You won $25,000!'
+  game-gap: 4 # in minutes must be greater than question length

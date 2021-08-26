@@ -1,9 +1,9 @@
-case-sensitive: false
+case-sensitive: true
 
 format:
   - " "
   - "{center}&6&lCHAT GAME"
-  - "{center}&7Unscramble &f{question}&7!"
+  - "{center}&7Type &f{question} &7exactly as it appears!"
   - " "
 
 expires: 15 # seconds
@@ -17,21 +17,14 @@ reward-pool:
     amount: 25000 # requires vault
     commands: # available placeholders: {msg} | {bc}
       - '{msg}&aYou won the chat game and won &2&l$25,000'
-      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
+      - '{bc}&6&lWINNER! &e{player} spelled &f{answer} &ein {time} seconds!'
   '2':
     amount: 50000 # requires vault
     commands:
       - '{msg}&aYou won the chat game and won &2&l$50,000'
-      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
+      - '{bc}&6&lWINNER! &e{player} spelled &f{answer} &ein {time} seconds!'
   '3':
     amount: 75000 # requires vault
     commands:
       - '{msg}&aYou won the chat game and won &2&l$75,000'
-      - '{bc}&6&lWINNER! &e{player} unscrambled &f{answer} &ein {time} seconds!'
-
-words:
-  - "SpigotMC"
-  - "Minecraft"
-  - "Red Sand"
-  - "Cobbled Deepslate"
-  - "Dark Oak Slab"
+      - '{bc}&6&lWINNER! &e{player} spelled &f{answer} &ein {time} seconds!'
