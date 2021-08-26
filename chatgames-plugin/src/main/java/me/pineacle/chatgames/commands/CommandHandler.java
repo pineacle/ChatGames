@@ -1,6 +1,7 @@
 package me.pineacle.chatgames.commands;
 
 import me.pineacle.chatgames.ChatGamesPlugin;
+import me.pineacle.chatgames.commands.subs.ForceCommand;
 import me.pineacle.chatgames.commands.subs.HelpCommand;
 import me.pineacle.chatgames.commands.subs.ToggleCommand;
 import org.bukkit.ChatColor;
@@ -26,6 +27,7 @@ public class CommandHandler implements CommandExecutor {
 
         registerSubCommand(new ToggleCommand(plugin));
         registerSubCommand(new HelpCommand(plugin));
+        registerSubCommand(new ForceCommand(plugin));
 
     }
 
@@ -46,8 +48,7 @@ public class CommandHandler implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
         if (args.length == 0) {
-            // help message
-            sender.sendMessage("");
+            getSubCommand(HelpCommand.class).execute(sender, label, args);
             return true;
         }
 

@@ -126,7 +126,7 @@ public class MathGame extends Game {
         int first = ThreadLocalRandom.current().nextInt(configuration.getInt("lowest"), configuration.getInt("highest"));
         int second = ThreadLocalRandom.current().nextInt(configuration.getInt("lowest"), configuration.getInt("highest"));
 
-        char operator = operators[ThreadLocalRandom.current().nextInt(2)];
+        char operator = operators[ThreadLocalRandom.current().nextInt(operators.length)];
 
         if (operator == '+') {
 

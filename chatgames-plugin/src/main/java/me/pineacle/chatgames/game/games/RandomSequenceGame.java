@@ -70,7 +70,7 @@ public class RandomSequenceGame extends Game {
 
     @Override
     public String name() {
-        return "Math";
+        return "Random";
     }
 
     @Override
