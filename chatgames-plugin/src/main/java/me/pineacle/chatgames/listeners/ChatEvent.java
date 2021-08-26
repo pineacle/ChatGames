@@ -1,7 +1,7 @@
 package me.pineacle.chatgames.listeners;
 
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.events.QuestionAnswerEvent;
+import me.pineacle.chatgames.events.AsyncQuestionAnswerEvent;
 import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.GameManager;
 import org.bukkit.Bukkit;
@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class ChatEvent implements Listener {
 
@@ -39,7 +38,7 @@ public class ChatEvent implements Listener {
                 Game game = optionalGame.get();
 
                 // prepare events
-                QuestionAnswerEvent questionAnswerEvent = new QuestionAnswerEvent(game, gameManager.getActive().get(game));
+                AsyncQuestionAnswerEvent questionAnswerEvent = new AsyncQuestionAnswerEvent(game, gameManager.getActive().get(game));
 
                 if (game.caseSensitive()) {
                     if (message.equals(questionAnswerEvent.getQuestion().getAnswers().get(0))) {
@@ -57,7 +56,7 @@ public class ChatEvent implements Listener {
         }
     }
 
-    private void handleCorrect(Player winner, AsyncPlayerChatEvent e, QuestionAnswerEvent questionAnswerEvent) {
+    private void handleCorrect(Player winner, AsyncPlayerChatEvent e, AsyncQuestionAnswerEvent questionAnswerEvent) {
         plugin.sync(() -> Bukkit.getPluginManager().callEvent(questionAnswerEvent));
         if (questionAnswerEvent.isCancelled()) return;
 

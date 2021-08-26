@@ -6,6 +6,10 @@ public interface IGameManager<Game, Question> {
 
     void register(Game type);
 
-    void force(Game type, Optional<Question> question);
+    /**
+     * Forces a game with optional params
+     * @param type
+     */
+    void force(Optional<Game> type);
 
 }

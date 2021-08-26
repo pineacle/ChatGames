@@ -22,10 +22,6 @@ import java.util.Objects;
 
 public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
 
-    /*
-    TODO: remove reward() from abstraction
-     */
-
     @Getter private static ChatGamesPlugin instance;
 
     // vault

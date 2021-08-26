@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class BaseCommand implements CommandExecutor, TabCompleter {
@@ -68,6 +69,9 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage("§cThe game is already disabled!");
                 else
                     plugin.getGameManager().stopGames();
+                return true;
+            } else if (args[0].equalsIgnoreCase("force")) {
+                plugin.getGameManager().force(Optional.empty());
                 return true;
             }
 

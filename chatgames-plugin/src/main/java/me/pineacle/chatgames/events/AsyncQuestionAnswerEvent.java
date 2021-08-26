@@ -6,12 +6,12 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class QuestionAnswerEvent extends ChatGameEvent implements Cancellable {
+public class AsyncQuestionAnswerEvent extends ChatGameEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean isCancelled;
 
-    public QuestionAnswerEvent(Game eventGame, Question eventQuestion) {
+    public AsyncQuestionAnswerEvent(Game eventGame, Question eventQuestion) {
         super(eventGame, eventQuestion);
         this.isCancelled = false;
     }

@@ -36,8 +36,6 @@ public class RandomSequenceGame extends Game {
     Abstract Methods
      */
 
-
-    // not necessary
     @Override
     public boolean caseSensitive() {
         return configuration.getBoolean("case-sensitive");

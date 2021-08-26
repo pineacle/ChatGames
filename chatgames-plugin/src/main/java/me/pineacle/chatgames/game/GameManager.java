@@ -9,6 +9,7 @@ import me.pineacle.chatgames.utils.Loadable;
 import me.pineacle.chatgames.utils.StringUtils;
 import me.pineacle.chatgames.utils.tasks.QuestionTask;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -52,10 +53,8 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
      */
     public void startGames() {
 
-        plugin.getLogger().info("Starting games..");
-
         gameSchedulerTask = plugin.syncRepeating(() -> {
-            Question currentQuestion = pickQuestion();
+            Question currentQuestion = pickQuestion(Optional.empty());
             questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
                 if (sec.getCounter() == currentQuestion.getGame().limit()) {
                     currentQuestion.getGame().expiredFormat(currentQuestion)
@@ -78,7 +77,6 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
      * Stops the games
      */
     public void stopGames() {
-        plugin.getLogger().info("Stopping games..");
         gameSchedulerTask.cancel();
         gameSchedulerTask = null;
     }
@@ -88,17 +86,17 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
      *
      * @return selected question
      */
-    public Question pickQuestion() {
+    public Question pickQuestion(Optional<Game> game) {
 
         // pick random game from game pool
-        Game currentGame = gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size()));
+        Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
 
         // pick random question from selected game
         Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt(currentGame.questions().size()));
 
         // if repeat question, reroll
         if (!active.isEmpty() && active.containsValue(picked) || active.containsKey(currentGame)) {
-            return pickQuestion();
+            return pickQuestion(Optional.empty());
         }
 
         // set the active Game and Question
@@ -129,6 +127,9 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         getGamePool().clear();
     }
 
+    /**
+     * Loads the games that are registered into game pool
+     */
     @Override
     public void load() {
 
@@ -152,10 +153,32 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         plugin.getGameRegistry().register(game);
     }
 
-
     @Override
-    public void force(Game type, Optional<Question> question) {
-        // stop active game and start it again. I'll probably improve this later
-        stopGames();
+    public void force(Optional<Game> game) {
+
+        Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
+        Question currentQuestion = pickQuestion(Optional.of(currentGame));
+
+        // stop the current question if active
+        if(questionTask!=null) {
+            questionTask.cancel();
+            questionTask = null;
+        }
+
+        questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
+            if (sec.getCounter() == currentQuestion.getGame().limit()) {
+                currentQuestion.getGame().expiredFormat(currentQuestion)
+                        .stream()
+                        .map(StringUtils::format)
+                        .collect(Collectors.toList())
+                        .forEach(line -> Bukkit.getOnlinePlayers()
+                                .forEach(player -> player.sendMessage(line.replace("{answer}", currentQuestion.getAnswers().get(0)))));
+                plugin.cancelTask(questionTask.getAssignedTaskId());
+                questionTask = null;
+            }
+        });
+        questionTask.ask();
+        questionTask.scheduleTimer();
+
     }
 }
