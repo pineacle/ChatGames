@@ -50,6 +50,26 @@ public class BaseCommand implements CommandExecutor, TabCompleter {
         } else {
             // is player
             Player player = (Player) sender;
+
+            if (args.length == 0) {
+                player.sendMessage("§cMissing argument: /chatgames [enable/disable]");
+                return false;
+            }
+
+            if (args[0].equalsIgnoreCase("enable")) {
+                if (plugin.getGameManager().getGameSchedulerTask() != null)
+                    player.sendMessage("§cThe game is already running.");
+                else
+                    plugin.getGameManager().startGames();
+                return true;
+            } else if (args[0].equalsIgnoreCase("disable")) {
+                if (plugin.getGameManager().getGameSchedulerTask() == null)
+                    player.sendMessage("§cThe game is already disabled!");
+                else
+                    plugin.getGameManager().stopGames();
+                return true;
+            }
+
         }
 
         return false;
