@@ -1,9 +1,9 @@
 package me.pineacle.chatgames.game.games;
 
+import me.pineacle.chatgames.API.game.Game;
+import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.GameManager;
-import me.pineacle.chatgames.game.Question;
 import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MathGame extends Game {
+public class MathGame implements Game {
 
-    private ChatGamesPlugin plugin;
-    private File file;
-    private FileConfiguration configuration;
-    private GameManager gameManager;
+    private final ChatGamesPlugin plugin;
+    private final File file;
+    private final FileConfiguration configuration;
+    private final GameManager gameManager;
 
     public MathGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
@@ -41,44 +41,57 @@ public class MathGame extends Game {
 
     // not necessary
     @Override
-    public boolean caseSensitive() {
+    public boolean getCaseSensitive() {
         return false;
     }
 
     @Override
-    public List<Question> questions() {
+    public Question getQuestion() {
 
-        List<Question> questionList = new ArrayList<>();
-        List<String> exp = equation();
+        return new Question() {
 
-        questionList.add(new Question(this, exp.get(0), Collections.singletonList(exp.get(1))));
+            final List<String> exp = equation();
 
-        return questionList;
+            @Override
+            public Game getGame() {
+                return MathGame.this;
+            }
+
+            @Override
+            public String getQuestion() {
+                return exp.get(0);
+            }
+
+            @Override
+            public List<String> getAnswers() {
+                return Collections.singletonList(exp.get(1));
+            }
+        };
 
     }
 
     @Override
-    public int limit() {
+    public int getLimit() {
         return configuration.getInt("expires");
     }
 
     @Override
-    public List<String> expiredFormat(Question question) {
+    public List<String> getExpiredFormat(Question question) {
         return configuration.getStringList("expired-format");
     }
 
     @Override
-    public List<String> format(Question question) {
+    public List<String> getFormat(Question question) {
         return configuration.getStringList("format");
     }
 
     @Override
-    public String name() {
+    public String getGameName() {
         return "Math";
     }
 
     @Override
-    public @NotNull void reward(Player winner, Optional<String> elapsedTime) {
+    public @NotNull void giveReward(Player winner, Optional<String> elapsedTime) {
 
         /*
         Take from the games .yml

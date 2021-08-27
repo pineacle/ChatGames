@@ -17,8 +17,8 @@ public class CommandHandler implements CommandExecutor {
 
     private final ChatGamesPlugin plugin;
 
-    private List<SubCommand> subCommands;
-    private Map<Class<? extends SubCommand>, SubCommand> subCommandsClazz;
+    private final List<SubCommand> subCommands;
+    private final Map<Class<? extends SubCommand>, SubCommand> subCommandsClazz;
 
     public CommandHandler(ChatGamesPlugin plugin) {
         this.plugin = plugin;

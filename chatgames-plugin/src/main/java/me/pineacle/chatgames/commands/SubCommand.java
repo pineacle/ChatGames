@@ -11,7 +11,7 @@ public abstract class SubCommand {
 
     @Getter private String name;
     @Getter @Setter private String permission;
-    private String[] aliases;
+    private final String[] aliases;
 
     public SubCommand(String name) {
         this(name, new String[0]);

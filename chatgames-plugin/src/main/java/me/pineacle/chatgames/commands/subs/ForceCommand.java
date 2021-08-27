@@ -1,8 +1,8 @@
 package me.pineacle.chatgames.commands.subs;
 
+import me.pineacle.chatgames.API.game.Game;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.commands.SubCommand;
-import me.pineacle.chatgames.game.Game;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 
@@ -43,7 +43,7 @@ public class ForceCommand extends SubCommand {
             return;
         }
 
-        Optional<Game> gameOptional = plugin.getGameManager().getGamePool().stream().filter(game -> game.name().equalsIgnoreCase(args[0])).findFirst();
+        Optional<Game> gameOptional = plugin.getGameManager().getGamePool().stream().filter(game -> game.getGameName().equalsIgnoreCase(args[0])).findFirst();
         plugin.getGameManager().force(gameOptional);
 
     }

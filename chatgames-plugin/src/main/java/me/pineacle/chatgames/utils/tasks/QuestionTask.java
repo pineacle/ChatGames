@@ -2,9 +2,9 @@ package me.pineacle.chatgames.utils.tasks;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.pineacle.chatgames.API.game.Game;
+import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.game.Game;
-import me.pineacle.chatgames.game.Question;
 import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -34,7 +34,7 @@ public class QuestionTask extends BukkitRunnable {
     }
 
     public void ask() {
-        this.game.format(question)
+        this.game.getFormat(question)
                 .stream()
                 .map(StringUtils::format)
                 .collect(Collectors.toList())

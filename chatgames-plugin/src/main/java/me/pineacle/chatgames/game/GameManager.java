@@ -2,7 +2,9 @@ package me.pineacle.chatgames.game;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.pineacle.chatgames.API.game.Game;
 import me.pineacle.chatgames.API.game.IGameManager;
+import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.game.games.*;
 import me.pineacle.chatgames.utils.Loadable;
@@ -15,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class GameManager implements IGameManager<Game>, Loadable {
+public class GameManager implements IGameManager, Loadable {
 
     private final ChatGamesPlugin plugin;
 
@@ -50,7 +52,7 @@ public class GameManager implements IGameManager<Game>, Loadable {
      */
     public void startGames() {
 
-        if(!isToggled())
+        if (!isToggled())
             return;
 
         if (Bukkit.getOnlinePlayers().size() < plugin.getConfig().getInt("game.required-players")) {
@@ -61,11 +63,15 @@ public class GameManager implements IGameManager<Game>, Loadable {
         gameSchedulerTask = plugin.syncRepeating(() -> {
             Question currentQuestion = pickQuestion(Optional.empty());
             questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
-                if (sec.getCounter() == currentQuestion.getGame().limit()) {
-                    currentQuestion.getGame().expiredFormat(currentQuestion)
+                if (sec.getCounter() == currentQuestion.getGame().getLimit()) {
+
+                    currentQuestion.getGame().getFormat(currentQuestion).get(0);
+
+                    currentQuestion.getGame().getExpiredFormat(currentQuestion)
                             .stream()
                             .map(StringUtils::format)
                             .collect(Collectors.toList())
+
                             .forEach(line -> Bukkit.getOnlinePlayers()
                                     .forEach(player -> player.sendMessage(line.replace("{answer}", currentQuestion.getAnswers().get(0)))));
                     plugin.cancelTask(questionTask.getAssignedTaskId());
@@ -103,7 +109,7 @@ public class GameManager implements IGameManager<Game>, Loadable {
         Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
 
         // pick random question from selected game
-        Question picked = currentGame.questions().get(ThreadLocalRandom.current().nextInt(currentGame.questions().size()));
+        Question picked = currentGame.getQuestion();
 
         // if repeat question, reroll
         if (!active.isEmpty() && active.containsValue(picked) || active.containsKey(currentGame)) {
@@ -144,21 +150,19 @@ public class GameManager implements IGameManager<Game>, Loadable {
     @Override
     public void load() {
 
-        // provided games
-        new ExactGame(plugin).register();
-        new UnscrambleGame(plugin).register();
-        new ReverseGame(plugin).register();
-        new MathGame(plugin).register();
-        new RandomSequenceGame(plugin).register();
+        List<Game> games = Arrays.asList(
+
+                // provided games
+                new ExactGame(plugin),
+                new UnscrambleGame(plugin),
+                new ReverseGame(plugin),
+                new MathGame(plugin),
+                new RandomSequenceGame(plugin));
+
+        games.forEach(game -> register(game));
 
     }
 
-    @Override
-    public void register(Game game) {
-        plugin.getGameRegistry().register(game);
-    }
-
-    @Override
     public void force(Optional<Game> game) {
 
         Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
@@ -171,8 +175,8 @@ public class GameManager implements IGameManager<Game>, Loadable {
         }
 
         questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
-            if (sec.getCounter() == currentQuestion.getGame().limit()) {
-                currentQuestion.getGame().expiredFormat(currentQuestion)
+            if (sec.getCounter() == currentQuestion.getGame().getLimit()) {
+                currentQuestion.getGame().getExpiredFormat(currentQuestion)
                         .stream()
                         .map(StringUtils::format)
                         .collect(Collectors.toList())
@@ -185,5 +189,12 @@ public class GameManager implements IGameManager<Game>, Loadable {
         questionTask.ask();
         questionTask.scheduleTimer();
 
+    }
+
+    @Override
+    public void register(Game type) {
+        plugin.getGameRegistry().register(type);
+        gamePool.add(type);
+        plugin.getLogger().info("Registered Game: " + type.getGameName());
     }
 }

@@ -1,9 +1,9 @@
 package me.pineacle.chatgames.game.games;
 
+import me.pineacle.chatgames.API.game.Game;
+import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.GameManager;
-import me.pineacle.chatgames.game.Question;
 import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ReverseGame extends Game {
+public class ReverseGame implements Game {
 
-    private ChatGamesPlugin plugin;
-    private File file;
-    private FileConfiguration configuration;
-    private GameManager gameManager;
+    private final ChatGamesPlugin plugin;
+    private final File file;
+    private final FileConfiguration configuration;
+    private final GameManager gameManager;
 
     public ReverseGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
@@ -39,43 +39,60 @@ public class ReverseGame extends Game {
      */
 
     @Override
-    public boolean caseSensitive() {
+    public boolean getCaseSensitive() {
         return configuration.getBoolean("case-sensitive");
     }
 
     @Override
-    public List<Question> questions() {
+    public Question getQuestion() {
 
-        // load the questions and answers from the yml file
-        List<Question> questions = new ArrayList<>();
-        plugin.getWords().getStringList("words").forEach(word -> questions.add(new Question(this, StringUtils.reverse(word), Collections.singletonList(word))));
+       // plugin.getWords().getStringList("words").forEach(word -> questions.add(new Question(this, StringUtils.reverse(word), Collections.singletonList(word))));
 
-        return questions;
+        return new Question() {
+
+            final String word = plugin.getWords().getStringList("words").get(ThreadLocalRandom.current().nextInt(plugin.getWords().getStringList("words").size()));
+            final String reversed = StringUtils.reverse(word);
+
+            @Override
+            public Game getGame() {
+                return ReverseGame.this;
+            }
+
+            @Override
+            public String getQuestion() {
+                return reversed;
+            }
+
+            @Override
+            public List<String> getAnswers() {
+                return Collections.singletonList(word);
+            }
+        };
 
     }
 
     @Override
-    public int limit() {
+    public int getLimit() {
         return configuration.getInt("expires");
     }
 
     @Override
-    public List<String> expiredFormat(Question question) {
+    public List<String> getExpiredFormat(Question question) {
         return configuration.getStringList("expired-format");
     }
 
     @Override
-    public List<String> format(Question question) {
+    public List<String> getFormat(Question question) {
         return configuration.getStringList("format");
     }
 
     @Override
-    public String name() {
+    public String getGameName() {
         return "Reverse";
     }
 
     @Override
-    public @NotNull void reward(Player winner, Optional<String> elapsedTime) {
+    public @NotNull void giveReward(Player winner, Optional<String> elapsedTime) {
 
         /*
         Take from the games .yml

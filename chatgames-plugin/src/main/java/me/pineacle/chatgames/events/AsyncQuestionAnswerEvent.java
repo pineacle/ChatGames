@@ -1,7 +1,7 @@
 package me.pineacle.chatgames.events;
 
-import me.pineacle.chatgames.game.Game;
-import me.pineacle.chatgames.game.Question;
+import me.pineacle.chatgames.API.game.Game;
+import me.pineacle.chatgames.API.game.Question;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;

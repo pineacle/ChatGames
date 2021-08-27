@@ -1,6 +1,7 @@
 package me.pineacle.chatgames.game;
 
 import lombok.Getter;
+import me.pineacle.chatgames.API.game.Game;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -14,8 +15,9 @@ public class GameRegistry {
     /**
      * Registers the game.
      * Only games registered will be in the game rotation.
+     * @param game
      */
-    public <S extends Game> void register(S game) {
+    public <S extends Game> void register(Game game) {
         map.put(game.getClass(), game);
     }
 

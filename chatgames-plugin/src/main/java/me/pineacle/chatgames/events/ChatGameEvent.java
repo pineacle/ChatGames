@@ -1,7 +1,7 @@
 package me.pineacle.chatgames.events;
 
-import me.pineacle.chatgames.game.Game;
-import me.pineacle.chatgames.game.Question;
+import me.pineacle.chatgames.API.game.Game;
+import me.pineacle.chatgames.API.game.Question;
 import org.bukkit.event.Event;
 
 /**
@@ -25,7 +25,7 @@ public abstract class ChatGameEvent extends Event {
     }
 
     /**
-     * @return Question asked.
+     * @return IQuestion asked.
      */
     public Question getQuestion() {
         return question;

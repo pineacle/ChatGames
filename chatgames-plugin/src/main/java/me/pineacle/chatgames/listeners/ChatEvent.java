@@ -1,8 +1,8 @@
 package me.pineacle.chatgames.listeners;
 
+import me.pineacle.chatgames.API.game.Game;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.events.AsyncQuestionAnswerEvent;
-import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,8 +14,8 @@ import java.util.Optional;
 
 public class ChatEvent implements Listener {
 
-    private ChatGamesPlugin plugin;
-    private GameManager gameManager;
+    private final ChatGamesPlugin plugin;
+    private final GameManager gameManager;
 
     public ChatEvent(ChatGamesPlugin plugin) {
         this.plugin = plugin;
@@ -40,7 +40,7 @@ public class ChatEvent implements Listener {
                 // prepare events
                 AsyncQuestionAnswerEvent questionAnswerEvent = new AsyncQuestionAnswerEvent(game, gameManager.getActive().get(game));
 
-                if (game.caseSensitive()) {
+                if (game.getCaseSensitive()) {
                     if (message.equals(questionAnswerEvent.getQuestion().getAnswers().get(0))) {
 
                         handleCorrect(winner, e, questionAnswerEvent);
@@ -69,7 +69,7 @@ public class ChatEvent implements Listener {
 
         String elapsedString = second + "." + millis;
 
-        questionAnswerEvent.getGame().reward(winner, Optional.of(elapsedString));
+        questionAnswerEvent.getGame().giveReward(winner, Optional.of(elapsedString));
 
         gameManager.getQuestionTask().cancel();
         gameManager.setQuestionTask(null);

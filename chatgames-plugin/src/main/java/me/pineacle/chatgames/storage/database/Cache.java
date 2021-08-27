@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public final class Cache {
 
-    private Set<User> cache;
+    private final Set<User> cache;
 
     public Cache() {
         cache = new HashSet<>();

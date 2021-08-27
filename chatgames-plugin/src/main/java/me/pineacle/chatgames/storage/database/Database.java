@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class Database {
 
     protected final ChatGamesPlugin plugin;
-    private Cache cache;
+    private final Cache cache;
 
     private Connection connection;
 
