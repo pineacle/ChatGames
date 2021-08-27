@@ -13,17 +13,30 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class DatabaseBackend {
+public abstract class Database {
 
     protected final ChatGamesPlugin plugin;
+    private Cache cache;
 
-    protected DatabaseBackend(final ChatGamesPlugin plugin) {
+    private Connection connection;
+
+    protected Database(final ChatGamesPlugin plugin) {
         this.plugin = plugin;
+        this.cache = new Cache();
+        plugin.async(() -> {
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.createStatement().execute("/* ping */ SELECT 1");
+                }
+            } catch (SQLException e) {
+                connection = getNewConnection();
+            }
+        });
     }
 
-    protected abstract Connection getConnection();
+    public abstract Connection getNewConnection();
 
-    protected abstract boolean isConnected();
+    public abstract boolean isConnected();
 
     /**
      * Requests User data from the database
@@ -34,7 +47,7 @@ public abstract class DatabaseBackend {
      * @return User requested
      * @throws UnavailableUserException if no user is found
      */
-    public User request(@NotNull UUID uuid) {
+    public User request(@NotNull UUID uuid) throws UnavailableUserException {
         return null;
     }
 
@@ -47,21 +60,16 @@ public abstract class DatabaseBackend {
 
     }
 
-    /**
-     * Connect to the database
-     */
-    public abstract void connect();
-
     /* Queries */
-    protected String CREATE_IF_NOT_EXIST = "";
+    protected final String CREATE_IF_NOT_EXIST = "";
+    //   protected final String INSERT = "INSERT INTO chatgame_players VALUES(?,?,?) ON DUPLICATE KEY UPDATE name=?";
 
     /**
-     * Creates the table if it doesn't exist
+     * Checks connection
      *
-     * @param connection connection to the databse
      */
-    protected void createIfNotExist(Connection connection) {
-        execute(connection, "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `name` varchar(16) NOT NULL, `wins` int NOT NULL, PRIMARY KEY (`uuid`)) ENGINE=InnoDB DEFAULT CHARSET=latin1");
+    protected void checkConnection() {
+        execute(connection, "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `name` varchar(16) NOT NULL, `wins` int NOT NULL, PRIMARY KEY (`uuid`))");
     }
 
     /**
@@ -83,6 +91,7 @@ public abstract class DatabaseBackend {
 
     /**
      * Updates table
+     *
      * @param statement SQL statement
      */
     @SneakyThrows
@@ -98,18 +107,18 @@ public abstract class DatabaseBackend {
 
     /**
      * Executes query
+     *
      * @param connection sql connection
-     * @param query query to execute
+     * @param query      query to execute
      */
+    @SneakyThrows
     protected void execute(Connection connection, String query) {
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.execute();
-        } catch (SQLException ignored) {
-        }
+        connection.createStatement().execute(query);
     }
 
     /**
      * Query the database
+     *
      * @param qry query to run
      * @return {@link CompletableFuture} of the {@link ResultSet}
      */
@@ -118,7 +127,7 @@ public abstract class DatabaseBackend {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement ps = getConnection().prepareStatement(qry);
+                PreparedStatement ps = getNewConnection().prepareStatement(qry);
                 return ps.executeQuery();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();

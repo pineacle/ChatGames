@@ -2,7 +2,7 @@ package me.pineacle.chatgames.storage.database.sqlite;
 
 import lombok.SneakyThrows;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.storage.database.DatabaseBackend;
+import me.pineacle.chatgames.storage.database.Database;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,17 +10,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class SQLite extends DatabaseBackend {
+public class SQLite extends Database {
 
-    private Connection localConnection;
-
-    protected SQLite(ChatGamesPlugin plugin) {
+    public SQLite(ChatGamesPlugin plugin) {
         super(plugin);
     }
 
     @SneakyThrows
     @Override
-    protected Connection getConnection() {
+    public Connection getNewConnection() {
         File dataFolder = new File(plugin.getDataFolder(), "database.db");
         if (!dataFolder.exists()) {
             try {
@@ -30,12 +28,8 @@ public class SQLite extends DatabaseBackend {
             }
         }
         try {
-            if (localConnection != null && !localConnection.isClosed()) {
-                return localConnection;
-            }
             Class.forName("org.sqlite.JDBC");
-            localConnection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            return localConnection;
+            return DriverManager.getConnection("jdbc:sqlite:" + dataFolder.getAbsolutePath());
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -43,15 +37,8 @@ public class SQLite extends DatabaseBackend {
     }
 
     @Override
-    protected boolean isConnected() {
-        return false;
+    public boolean isConnected() {
+        return getNewConnection() != null;
     }
-
-
-    @Override
-    public void connect() {
-
-    }
-
 
 }

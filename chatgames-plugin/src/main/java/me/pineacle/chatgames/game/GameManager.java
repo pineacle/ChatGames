@@ -22,26 +22,24 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
     /**
      * List of all active game types
      */
-    @Getter
-    private List<Game> gamePool = new ArrayList<>();
+    @Getter private List<Game> gamePool = new ArrayList<>();
 
     /**
      * Gets the active Game and Question
      */
-    @Getter
-    private Map<Game, Question> active = new HashMap(1);
+    @Getter private Map<Game, Question> active = new HashMap(1);
 
     /**
      * Question currently being ask
      */
-    @Getter @Setter
-    public QuestionTask questionTask = null;
+    @Getter @Setter public QuestionTask questionTask = null;
 
     /**
      * Game task
      */
-    @Getter @Setter
-    public BukkitTask gameSchedulerTask = null;
+    @Getter @Setter public BukkitTask gameSchedulerTask = null;
+
+    @Getter @Setter private boolean toggled = true;
 
     public GameManager(ChatGamesPlugin plugin) {
         this.plugin = plugin;
@@ -51,6 +49,14 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
      * Begins and repeats broadcasting the games
      */
     public void startGames() {
+
+        if(!isToggled())
+            return;
+
+        if (Bukkit.getOnlinePlayers().size() < plugin.getConfig().getInt("game.required-players")) {
+            plugin.getLogger().info("Games are disabled because player requirement is not met");
+            return;
+        }
 
         gameSchedulerTask = plugin.syncRepeating(() -> {
             Question currentQuestion = pickQuestion(Optional.empty());

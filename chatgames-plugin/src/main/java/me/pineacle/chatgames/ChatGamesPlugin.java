@@ -6,8 +6,11 @@ import me.pineacle.chatgames.commands.CommandHandler;
 import me.pineacle.chatgames.game.GameManager;
 import me.pineacle.chatgames.game.GameRegistry;
 import me.pineacle.chatgames.listeners.ChatEvent;
+import me.pineacle.chatgames.listeners.JoinEvent;
 import me.pineacle.chatgames.storage.config.Config;
 import me.pineacle.chatgames.storage.config.Language;
+import me.pineacle.chatgames.storage.database.Database;
+import me.pineacle.chatgames.storage.database.sqlite.SQLite;
 import me.pineacle.chatgames.user.UserManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -25,7 +28,6 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
 
     @Getter private static ChatGamesPlugin instance;
 
-    // vault
     @Getter private Economy economy = null;
     @Getter private boolean usingVault = false;
 
@@ -37,8 +39,9 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
 
     @Getter private Config gameConfig;
     @Getter private Language language;
-
     @Getter private FileConfiguration words;
+
+    @Getter private Database database;
 
     @Override
     public void onEnable() {
@@ -63,9 +66,12 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         saveDefaultConfig();
 
         Bukkit.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("chatgames").setExecutor(commandHandler = new CommandHandler(this));
 
         if (setupEconomy()) usingVault = true;
+
+        setupDatabase();
 
         gameManager.startGames();
     }
@@ -80,6 +86,18 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         gameManager.load();
     }
 
+    public void setupDatabase() {
+        boolean usingMySQL = getConfig().getBoolean("settings.use-mysql");
+
+        if(!usingMySQL) {
+            this.database = new SQLite(this);
+        } else {
+            // mysql
+        }
+
+        database.getNewConnection();
+
+    }
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) return false;

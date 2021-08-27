@@ -2,7 +2,7 @@ settings:
   language: en_US
   version: 1 # recommended to not touch
   use-mysql: false # uses SQLite if false
-  mysql: # use if 'use-mysql' is true
+  mysql: # ignore below if 'use-mysql' is false
     host: localhost
     port: '3306'
     database: chatgames
@@ -12,4 +12,8 @@ settings:
 
 game:
   required-players: 1
+  sound:
+    name: ENTITY_CHICKEN_EGG # use 'none' for no sound
+    pitch: 1
+    volume: 0.5
   game-gap: 4 # in minutes must be greater than question length

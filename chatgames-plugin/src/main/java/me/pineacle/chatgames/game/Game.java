@@ -1,8 +1,8 @@
 package me.pineacle.chatgames.game;
 
+import me.pineacle.chatgames.API.game.IGame;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Base class for all game types
  */
-public abstract class Game {
+public abstract class Game implements IGame<Question> {
 
     /**
      * If the game requires case sensitivity
@@ -51,7 +51,7 @@ public abstract class Game {
     /**
      * @return List of rewards
      */
-    public abstract @NotNull void reward(Player winner, Optional<String> elapsedTime);
+    public abstract void reward(Player winner, Optional<String> elapsedTime);
 
     /* Provided methods */
 

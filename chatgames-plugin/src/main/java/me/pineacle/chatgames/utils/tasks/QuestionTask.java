@@ -7,6 +7,7 @@ import me.pineacle.chatgames.game.Game;
 import me.pineacle.chatgames.game.Question;
 import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -38,6 +39,10 @@ public class QuestionTask extends BukkitRunnable {
                 .map(StringUtils::format)
                 .collect(Collectors.toList())
                 .forEach(line -> Bukkit.getOnlinePlayers().forEach(player -> {
+
+                    if (!plugin.getConfig().getString("game.sound.name").equalsIgnoreCase("none"))
+                        player.playSound(player.getLocation(), Sound.valueOf(plugin.getConfig().getString("game.sound.name")), (float) plugin.getConfig().getDouble("game.sound.volume"), (float) plugin.getConfig().getDouble("game.sound.pitch"));
+
                     if (line.startsWith("{center}"))
                         StringUtils.sendCenteredMessage(player, line.replace("{question}", question.getQuestion()).replace("{center}", ""));
                     else

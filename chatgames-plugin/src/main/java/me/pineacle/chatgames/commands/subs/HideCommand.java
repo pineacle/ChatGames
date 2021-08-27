@@ -8,14 +8,14 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public class ToggleCommand extends SubCommand {
+public class HideCommand extends SubCommand {
 
     private final ChatGamesPlugin plugin;
 
-    public ToggleCommand(ChatGamesPlugin plugin) {
-        super("toggle");
+    public HideCommand(ChatGamesPlugin plugin) {
+        super("hide");
         this.plugin = plugin;
-        setPermission("chatgames.toggle");
+        setPermission("chatgames.hide");
     }
 
     @Override
@@ -35,20 +35,12 @@ public class ToggleCommand extends SubCommand {
 
     @Override
     public void execute(CommandSender sender, String label, String[] args) throws CommandException {
-        if (plugin.getGameManager().getGameSchedulerTask() != null) {
-            plugin.getGameManager().stopGames();
-            plugin.getGameManager().setToggled(false);
-            sender.sendMessage(plugin.getLanguage().get("game-stopped"));
-        } else {
-            plugin.getGameManager().setToggled(true);
-            plugin.getGameManager().startGames();
-            sender.sendMessage(plugin.getLanguage().get("game-started"));
-        }
+
     }
 
     @Override
     public List<String> getDescription() {
-        return Collections.singletonList("Starts the chat games if not enabled already.");
+        return Collections.singletonList("Hides the chat games from popping up in chat");
     }
 
 }
