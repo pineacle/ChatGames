@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class GameManager implements IGameManager<Game, Question>, Loadable {
+public class GameManager implements IGameManager<Game>, Loadable {
 
     private final ChatGamesPlugin plugin;
 
@@ -150,12 +150,6 @@ public class GameManager implements IGameManager<Game, Question>, Loadable {
         new ReverseGame(plugin).register();
         new MathGame(plugin).register();
         new RandomSequenceGame(plugin).register();
-
-        // log and load registered games
-        plugin.getGameRegistry().getMap().forEach((clazz, game) -> {
-            gamePool.add(game);
-            plugin.getLogger().info("Registered Game: " + game.name());
-        });
 
     }
 

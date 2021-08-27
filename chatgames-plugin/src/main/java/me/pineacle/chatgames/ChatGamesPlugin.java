@@ -2,6 +2,7 @@ package me.pineacle.chatgames;
 
 import lombok.Getter;
 import me.pineacle.chatgames.API.IChatGames;
+import me.pineacle.chatgames.API.game.IGame;
 import me.pineacle.chatgames.commands.CommandHandler;
 import me.pineacle.chatgames.game.GameManager;
 import me.pineacle.chatgames.game.GameRegistry;
@@ -54,8 +55,6 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         gameConfig = new Config(this);
         language = new Language(this, gameConfig);
 
-        loadGames();
-
         // generate words file
         File wordsFile = new File(getDataFolder() + "/words.yml");
         if (!wordsFile.exists()) {
@@ -73,6 +72,14 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
 
         setupDatabase();
 
+        loadGames();
+
+        gameRegistry.getMap().forEach((clazz, game) -> {
+            if (clazz.isInstance(IGame.class))
+                gameManager.getGamePool().add(game);
+            getLogger().info("Registered Game: " + game.name());
+        });
+
         gameManager.startGames();
     }
 
@@ -89,7 +96,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
     public void setupDatabase() {
         boolean usingMySQL = getConfig().getBoolean("settings.use-mysql");
 
-        if(!usingMySQL) {
+        if (!usingMySQL) {
             this.database = new SQLite(this);
         } else {
             // mysql

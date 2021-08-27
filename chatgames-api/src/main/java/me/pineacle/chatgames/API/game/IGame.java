@@ -1,6 +1,5 @@
 package me.pineacle.chatgames.API.game;
 
-import me.pineacle.chatgames.API.ChatGamesAPI;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -22,8 +21,6 @@ public interface IGame<Question> {
 
     void reward(Player player, Optional<String> elapsed);
 
-    default void register() {
-        ChatGamesAPI.getGameManager().register(this);
-    }
+    void register();
 
 }
