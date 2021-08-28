@@ -51,5 +51,61 @@ public void onEnable() {
 ```
 
 ```java
-public class ExampleGame implements Game {}
+public class ExampleGame implements Game {
+
+    @Override
+    public boolean getCaseSensitive() { return false; }
+
+    @Override
+    public Question getQuestion() {
+        return new Question() {
+            @Override
+            public Game getGame() {
+                return ExampleGame.this;
+            }
+
+            @Override
+            public String getQuestion() {
+                return "10 * 5";
+            }
+
+            @Override
+            public List<String> getAnswers() {
+                return Collections.singletonList("50");
+            }
+        };
+    }
+
+    /**
+    * Time in seconds until the question expires
+    */
+    @Override
+    public int getLimit() {
+        return 30;
+    }
+
+    @Override
+    public List<String> getExpiredFormat(Question o) {
+        return Arrays.asList("You weren't able to guess {answer}!");
+    }
+
+    @Override
+    public List<String> getFormat(Question o) {
+        return Arrays.asList("What is {question}");
+    }
+
+    @Override
+    public String getGameName() {
+        return "Example";
+    }
+
+    @Override
+    public void giveReward(Player winner, String elapsedTime, String answer) {
+
+        // reward logic
+        // called when someone wins the chat game
+
+    }
+
+}
 ```
