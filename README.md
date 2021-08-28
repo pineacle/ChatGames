@@ -14,39 +14,20 @@ Have your players compete in chat games that will test their quickness.
 
 ### For Developers
 
-#### Repository
-Maven:
+#### Using Maven
 ```xml
 <repository>
   <id>jitpack-repo</id>
   <url>https://jitpack.io</url>
 </repository>
 ```
-
-Gradle:
-```groovy
-maven {
-    name 'jitpack-repo'
-    url 'https://jitpack.io'
-}
-```
-
-#### Dependency
-Maven:
 ```xml
 <dependency>
     <groupId>com.github.pineacle.ChatGames</groupId>
     <artifactId>chatgames-api</artifactId>
     <version>master-SNAPSHOT</version>
 </dependency>
-```
-
-Gradle:
-```groovy
-compile (group: 'com.github.pineacle.ChatGames', name: 'chatgames-api', version: 'master-SNAPSHOT') {
-    transitive = false
-}
-```  
+``` 
 
 ### plugin.yml
 Add ChatGames as a (soft)-depend in your .yml
