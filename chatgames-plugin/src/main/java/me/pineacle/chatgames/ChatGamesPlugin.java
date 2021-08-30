@@ -73,7 +73,6 @@ public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
 
         gameManager.load();
 
-        gameManager.startGames();
     }
 
     @Override
