@@ -38,12 +38,12 @@ soft-depend: [ChatGames]
 ### Using the API
 
 ```java
-public IChatGames api = null;
+public ChatGames api = null;
 
 @Override
 public void onEnable() {
     if (Bukkit.getServer().getPluginManager().getPlugin("ChatGames") != null)
-        api = (IChatGames) Bukkit.getServer().getPluginManager().getPlugin("ChatGames");
+        api = (ChatGames) Bukkit.getServer().getPluginManager().getPlugin("ChatGames");
 
     if (api != null) api.getGameManager().register(Class<? extends Game>);
 
