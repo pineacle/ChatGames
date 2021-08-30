@@ -102,6 +102,7 @@ public class GameManagerImpl implements GameManager, Loadable {
      *
      * @return selected question
      */
+    @Override
     public Question pickQuestion(Optional<Game> game) {
 
         // pick random game from game pool
@@ -126,6 +127,7 @@ public class GameManagerImpl implements GameManager, Loadable {
     /**
      * @return Currently asked question, null if none.
      */
+    @Override
     public Question getActiveQuestion() {
         Optional<Game> firstKey = active.keySet().stream().findFirst();
         if (firstKey.isPresent()) {
@@ -162,6 +164,7 @@ public class GameManagerImpl implements GameManager, Loadable {
 
     }
 
+    @Override
     public void force(Optional<Game> game) {
 
         Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
