@@ -14,7 +14,6 @@ public class GameRegistry {
 
     /**
      * Registers the game.
-     * Only games registered will be in the game rotation.
      * @param game
      */
     public <S extends Game> void register(Game game) {

@@ -3,7 +3,7 @@ package me.pineacle.chatgames.game;
 import lombok.Getter;
 import lombok.Setter;
 import me.pineacle.chatgames.API.game.Game;
-import me.pineacle.chatgames.API.game.IGameManager;
+import me.pineacle.chatgames.API.game.GameManager;
 import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.game.games.*;
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class GameManager implements IGameManager, Loadable {
+public class GameManagerImpl implements GameManager, Loadable {
 
     private final ChatGamesPlugin plugin;
 
@@ -43,7 +43,7 @@ public class GameManager implements IGameManager, Loadable {
 
     @Getter @Setter private boolean toggled = true;
 
-    public GameManager(ChatGamesPlugin plugin) {
+    public GameManagerImpl(ChatGamesPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -55,8 +55,7 @@ public class GameManager implements IGameManager, Loadable {
         if (!isToggled())
             return;
 
-        if (Bukkit.getOnlinePlayers().size() < plugin.getConfig().getInt("game.required-players")) {
-            plugin.getLogger().info("Games are disabled because player requirement is not met");
+        if (!meetsPlayerRequirement()) {
             return;
         }
 
@@ -112,7 +111,7 @@ public class GameManager implements IGameManager, Loadable {
         Question picked = currentGame.getQuestion();
 
         // if repeat question, reroll
-        if (!active.isEmpty() && active.containsValue(picked) || active.containsKey(currentGame)) {
+        if (!active.isEmpty() && active.containsValue(picked)) {
             return pickQuestion(Optional.empty());
         }
 
@@ -189,6 +188,13 @@ public class GameManager implements IGameManager, Loadable {
         questionTask.ask();
         questionTask.scheduleTimer();
 
+    }
+
+    public boolean meetsPlayerRequirement() {
+        if (Bukkit.getOnlinePlayers().size() >= plugin.getConfig().getInt("game.required-players")) {
+            return true;
+        }
+        return false;
     }
 
     @Override

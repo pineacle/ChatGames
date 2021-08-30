@@ -8,11 +8,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 
 public class Language implements IConfiguration {
 
     private final ChatGamesPlugin plugin;
     private final Config configManager;
+    private FileConfiguration yamlConfiguration;
 
     @Getter private final HashMap<String, String> translationMap;
 
@@ -30,8 +32,9 @@ public class Language implements IConfiguration {
             if (!langFile.exists()) {
                 this.plugin.getLogger().warning("Defaulting language to en_US. Couldn't find the language file '" + this.configManager.getServerLocale() + ".yml'");
             } else {
-                YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(langFile);
+                yamlConfiguration = YamlConfiguration.loadConfiguration(langFile);
                 for (String s : yamlConfiguration.getKeys(false)) {
+                    if (yamlConfiguration.get(s) instanceof List) continue;
                     this.translationMap.put(s, yamlConfiguration.getString(s));
                 }
                 this.plugin.getLogger().warning("Found language file '" + this.configManager.getServerLocale() + ".yml'");
@@ -49,8 +52,9 @@ public class Language implements IConfiguration {
                 } catch (IOException e) {
                     this.plugin.getLogger().warning("Couldn't copy language file!");
                 }
-            YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(langFile);
+            yamlConfiguration = YamlConfiguration.loadConfiguration(langFile);
             for (String s : yamlConfiguration.getKeys(false)) {
+                if (yamlConfiguration.get(s) instanceof List) continue;
                 this.translationMap.put(s, yamlConfiguration.getString(s));
             }
             this.plugin.getLogger().warning("Found language file '" + this.configManager.getServerLocale() + ".yml'");
@@ -65,7 +69,7 @@ public class Language implements IConfiguration {
 
     @Override
     public FileConfiguration get() {
-        return null; // unused, use #getTranslationMap()
+        return yamlConfiguration;
     }
 
     public String get(String path) {

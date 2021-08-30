@@ -1,9 +1,7 @@
 package me.pineacle.chatgames.commands;
 
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.commands.subs.ForceCommand;
-import me.pineacle.chatgames.commands.subs.HelpCommand;
-import me.pineacle.chatgames.commands.subs.ToggleCommand;
+import me.pineacle.chatgames.commands.subs.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
@@ -28,6 +26,8 @@ public class CommandHandler implements CommandExecutor {
         registerSubCommand(new ToggleCommand(plugin));
         registerSubCommand(new HelpCommand(plugin));
         registerSubCommand(new ForceCommand(plugin));
+        registerSubCommand(new HideCommand(plugin));
+        registerSubCommand(new StatsCommand(plugin));
 
     }
 
@@ -64,7 +64,7 @@ public class CommandHandler implements CommandExecutor {
             if (subCommand.isValidTrigger(args[0])) {
 
                 if (!subCommand.hasPermission(sender)) {
-                    sender.sendMessage(ChatColor.RED + "You don't have permission.");
+                    sender.sendMessage(plugin.getLanguage().get("no-permission"));
                     return true;
                 }
 

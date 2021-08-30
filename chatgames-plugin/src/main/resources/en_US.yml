@@ -1,2 +1,11 @@
 game-started: '&7Successfully toggled the chat games &aon.'
 game-stopped: '&7Successfully toggled the chat games &coff.'
+game-hidden: '&7You will no longer receive chat games until toggled on.'
+game-unhidden: '&7You will now receive chat games.'
+no-permission: '&cYou do not have permission to do this.'
+stats-format:
+  - ""
+  - "&6&lCHATGAMES"
+  - "&eWins: &7{wins}"
+  - "&eStatus: &7{status}"
+  - ""

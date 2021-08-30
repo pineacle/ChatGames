@@ -12,7 +12,7 @@ public class AsyncQuestionAnswerEvent extends ChatGameEvent implements Cancellab
     private boolean isCancelled;
 
     public AsyncQuestionAnswerEvent(Game eventGame, Question eventQuestion) {
-        super(eventGame, eventQuestion);
+        super(eventGame, eventQuestion, true);
         this.isCancelled = false;
     }
 

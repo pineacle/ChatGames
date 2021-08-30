@@ -1,22 +1,25 @@
 package me.pineacle.chatgames.commands.subs;
 
+import me.pineacle.chatgames.API.user.User;
 import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.commands.SubCommand;
+import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class HideCommand extends SubCommand {
+public class StatsCommand extends SubCommand {
 
     private final ChatGamesPlugin plugin;
 
-    public HideCommand(ChatGamesPlugin plugin) {
-        super("hide");
+    public StatsCommand(ChatGamesPlugin plugin) {
+        super("stats");
         this.plugin = plugin;
-        setPermission("chatgames.hide");
+        setPermission("chatgames.stats");
     }
 
     @Override
@@ -37,20 +40,17 @@ public class HideCommand extends SubCommand {
     @Override
     public void execute(CommandSender sender, String label, String[] args) throws CommandException {
         Player player = (Player) sender;
-        if (plugin.getUserManager().isToggled(player.getUniqueId())) {
-            // hide
-            plugin.getUserManager().setToggled(player.getUniqueId(), false);
-            player.sendMessage(plugin.getLanguage().get("game-hidden"));
-        } else {
-            // unhide
-            plugin.getUserManager().setToggled(player.getUniqueId(), true);
-            player.sendMessage(plugin.getLanguage().get("game-unhidden"));
-        }
+        User user = plugin.getUserManager().getUser(player.getUniqueId());
+        plugin.getLanguage().get().getStringList("stats-format")
+                .stream()
+                .map(StringUtils::format)
+                .collect(Collectors.toList())
+                .forEach(line -> player.sendMessage(line.replace("{wins}", String.valueOf(user.getWins()))
+                        .replace("{status}", !user.isToggled() ? "hidden" : "visible")));
     }
 
     @Override
     public List<String> getDescription() {
-        return Collections.singletonList("Hides the chat games from popping up in chat");
+        return Collections.singletonList("Gets current statistics on chat games");
     }
-
 }

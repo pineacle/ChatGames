@@ -3,7 +3,7 @@ package me.pineacle.chatgames.game.games;
 import me.pineacle.chatgames.API.game.Game;
 import me.pineacle.chatgames.API.game.Question;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.game.GameManager;
+import me.pineacle.chatgames.game.GameManagerImpl;
 import me.pineacle.chatgames.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MathGame implements Game {
@@ -23,7 +22,7 @@ public class MathGame implements Game {
     private final ChatGamesPlugin plugin;
     private final File file;
     private final FileConfiguration configuration;
-    private final GameManager gameManager;
+    private final GameManagerImpl gameManager;
 
     public MathGame(ChatGamesPlugin plugin) {
         this.plugin = plugin;
@@ -91,7 +90,7 @@ public class MathGame implements Game {
     }
 
     @Override
-    public @NotNull void giveReward(Player winner, Optional<String> elapsedTime) {
+    public @NotNull void giveReward(Player winner, String elapsedTime, String answer) {
 
         /*
         Take from the games .yml
@@ -123,12 +122,12 @@ public class MathGame implements Game {
 
     }
 
-    private String replace(String command, String replacement, Player winner, Optional<String> elapsedTime) {
+    private String replace(String command, String replacement, Player winner, String elapsedTime) {
         return StringUtils.format(command.replace(replacement, "")
                 .replace("{player}", winner.getName())
                 .replace("{display_name}", winner.getDisplayName())
                 .replace("{answer}", gameManager.getActiveQuestion().getAnswers().get(0))
-                .replace("{time}", elapsedTime.orElse("")));
+                .replace("{time}", elapsedTime));
     }
 
     private List<String> equation() {

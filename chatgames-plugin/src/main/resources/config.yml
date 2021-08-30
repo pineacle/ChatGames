@@ -12,6 +12,7 @@ settings:
 
 game:
   required-players: 1
+  show-players-message: false # should it show what the player typed in chat upon answering the question
   sound:
     name: ENTITY_CHICKEN_EGG # use 'none' for no sound
     pitch: 1

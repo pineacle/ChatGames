@@ -1,14 +1,14 @@
 package me.pineacle.chatgames.API;
 
-import me.pineacle.chatgames.API.game.IGameManager;
-import me.pineacle.chatgames.API.user.IUserManager;
+import me.pineacle.chatgames.API.game.GameManager;
+import me.pineacle.chatgames.API.user.UserManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public interface IChatGames extends Plugin {
+public interface ChatGames extends Plugin {
 
     /**
      * Returns the UserManager
@@ -16,7 +16,7 @@ public interface IChatGames extends Plugin {
      * @return UserManager singleton
      * @since 1.0.0
      */
-    @NotNull IUserManager getUserManager();
+    @NotNull UserManager getUserManager();
 
     /**
      * Returns the GameManager
@@ -24,7 +24,7 @@ public interface IChatGames extends Plugin {
      * @return GameManager singleton
      * @since 1.0.0
      */
-    @NotNull IGameManager getGameManager();
+    @NotNull GameManager getGameManager();
 
 
     /**
@@ -67,6 +67,17 @@ public interface IChatGames extends Plugin {
      * @since 1.0.0
      */
     BukkitTask async(@NotNull final Runnable task);
+
+    /**
+     * Schedules an <b>asynchronous</b> task on separate thread
+     *
+     * <b>don't access the {@link Bukkit} API asynchronously</b>
+     *
+     * @param task task to run
+     * @return BukkitTask
+     * @since 1.0.0
+     */
+    BukkitTask asyncRepeating(@NotNull final Runnable task, long delay, long interval);
 
     /**
      * Cancels BukkitTask

@@ -40,6 +40,9 @@ public class QuestionTask extends BukkitRunnable {
                 .collect(Collectors.toList())
                 .forEach(line -> Bukkit.getOnlinePlayers().forEach(player -> {
 
+                    // don't send if hidden
+                    if (!plugin.getDatabase().getCache().get(player.getUniqueId()).isToggled()) return;
+
                     if (!plugin.getConfig().getString("game.sound.name").equalsIgnoreCase("none"))
                         player.playSound(player.getLocation(), Sound.valueOf(plugin.getConfig().getString("game.sound.name")), (float) plugin.getConfig().getDouble("game.sound.volume"), (float) plugin.getConfig().getDouble("game.sound.pitch"));
 

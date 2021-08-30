@@ -1,17 +1,17 @@
 package me.pineacle.chatgames;
 
 import lombok.Getter;
-import me.pineacle.chatgames.API.IChatGames;
+import me.pineacle.chatgames.API.ChatGames;
 import me.pineacle.chatgames.commands.CommandHandler;
-import me.pineacle.chatgames.game.GameManager;
+import me.pineacle.chatgames.game.GameManagerImpl;
 import me.pineacle.chatgames.game.GameRegistry;
 import me.pineacle.chatgames.listeners.ChatEvent;
-import me.pineacle.chatgames.listeners.JoinEvent;
+import me.pineacle.chatgames.listeners.JoinLeaveEvent;
 import me.pineacle.chatgames.storage.config.Config;
 import me.pineacle.chatgames.storage.config.Language;
 import me.pineacle.chatgames.storage.database.Database;
 import me.pineacle.chatgames.storage.database.sqlite.SQLite;
-import me.pineacle.chatgames.user.UserManager;
+import me.pineacle.chatgames.user.UserManagerImpl;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,15 +24,15 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Objects;
 
-public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
+public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
 
     @Getter private static ChatGamesPlugin instance;
 
     @Getter private Economy economy = null;
     @Getter private boolean usingVault = false;
 
-    @Getter private UserManager userManager;
-    @Getter private GameManager gameManager;
+    @Getter private UserManagerImpl userManager;
+    @Getter private GameManagerImpl gameManager;
     @Getter private GameRegistry gameRegistry;
 
     @Getter private CommandHandler commandHandler;
@@ -47,8 +47,8 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
     public void onEnable() {
         instance = this;
 
-        userManager = new UserManager();
-        gameManager = new GameManager(this);
+        userManager = new UserManagerImpl(this);
+        gameManager = new GameManagerImpl(this);
         gameRegistry = new GameRegistry();
 
         gameConfig = new Config(this);
@@ -64,7 +64,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
         saveDefaultConfig();
 
         Bukkit.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new JoinEvent(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new JoinLeaveEvent(this), this);
         getCommand("chatgames").setExecutor(commandHandler = new CommandHandler(this));
 
         if (setupEconomy()) usingVault = true;
@@ -79,6 +79,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
     @Override
     public void onDisable() {
         gameManager.unload();
+        database.shutdown();
     }
 
     public void setupDatabase() {
@@ -121,6 +122,11 @@ public final class ChatGamesPlugin extends JavaPlugin implements IChatGames {
     @Override
     public BukkitTask async(@NotNull Runnable task) {
         return getServer().getScheduler().runTaskAsynchronously(this, task);
+    }
+
+    @Override
+    public BukkitTask asyncRepeating(@NotNull Runnable task, long delay, long interval) {
+        return getServer().getScheduler().runTaskTimerAsynchronously(this, task, delay, interval);
     }
 
     @Override

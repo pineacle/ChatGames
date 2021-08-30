@@ -1,8 +1,10 @@
 package me.pineacle.chatgames.storage.database;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
+import me.pineacle.chatgames.API.user.User;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import me.pineacle.chatgames.user.User;
+import me.pineacle.chatgames.user.UserImpl;
 import me.pineacle.chatgames.utils.exeptions.UnavailableUserException;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,14 +18,19 @@ import java.util.concurrent.CompletableFuture;
 public abstract class Database {
 
     protected final ChatGamesPlugin plugin;
-    private final Cache cache;
+    @Getter private final Cache<User> cache;
 
     private Connection connection;
+
+    /* Queries */
+    private final String CREATE_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `wins` int NOT NULL, `toggled` boolean NOT NULL DEFAULT 'false', PRIMARY KEY (`uuid`))";
+    private final String INSERT = "INSERT INTO chatgame_players VALUES(?,?,?)";
+    private final String UPDATE = "UPDATE chatgame_players SET wins=?, toggled=? WHERE uuid=?";
 
     protected Database(final ChatGamesPlugin plugin) {
         this.plugin = plugin;
         this.cache = new Cache();
-        plugin.async(() -> {
+        plugin.asyncRepeating(() -> {
             try {
                 if (connection != null && !connection.isClosed()) {
                     connection.createStatement().execute("/* ping */ SELECT 1");
@@ -31,63 +38,140 @@ public abstract class Database {
             } catch (SQLException e) {
                 connection = getNewConnection();
             }
-        });
+        }, 60 * 20, 60 * 20);
     }
 
+    /**
+     * Establishes a new connection
+     *
+     * @return connection
+     */
     public abstract Connection getNewConnection();
 
+    /**
+     * Returns if a connection is established
+     */
     public abstract boolean isConnected();
 
     /**
-     * Requests User data from the database
-     * <br>
-     * <b>Save back to the cache/database after editing</b>
+     * Requests User data from the database and stores to cache
      *
      * @param uuid {@link UUID} of the player
-     * @return User requested
-     * @throws UnavailableUserException if no user is found
+     * @return boolean if request was successful
+     * @throws UnavailableUserException if no user found
      */
-    public User request(@NotNull UUID uuid) throws UnavailableUserException {
+    public User request(@NotNull UUID uuid) {
+        checkConnection();
+        if (!isConnected())
+            throw new UnavailableUserException("Unable to fetch player data because database is not connected.");
+
+        query("SELECT * FROM `chatgame_players` WHERE uuid='" + uuid + "'").thenApply(resultSet -> {
+            try {
+                if (resultSet.next()) {
+                    User user = new UserImpl(UUID.fromString(resultSet.getString(1)), resultSet.getInt(2), resultSet.getBoolean(3));
+                    cache.put(uuid, user);
+                    return user;
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            return null;
+        });
+
         return null;
     }
 
     /**
-     * Save users data from the cache
+     * Create a user in the database
      *
      * @param uuid {@link UUID} of the player
      */
-    public void save(@NotNull UUID uuid) {
-
+    public void create(@NotNull UUID uuid) {
+        checkConnection();
+        if (!isConnected()) return;
+        try {
+            PreparedStatement statement = connection.prepareStatement(INSERT);
+            statement.setString(1, uuid.toString()); // uuid
+            statement.setInt(2, 0); // wins
+            statement.setBoolean(3, true); // toggled on by default
+            statement.addBatch();
+            update(statement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            UserImpl user = new UserImpl(uuid, 0, true);
+            cache.put(uuid, user);
+        }
+        return;
     }
 
-    /* Queries */
-    protected final String CREATE_IF_NOT_EXIST = "";
-    //   protected final String INSERT = "INSERT INTO chatgame_players VALUES(?,?,?) ON DUPLICATE KEY UPDATE name=?";
+    /**
+     * Save users data from the cache
+     */
+    @SneakyThrows
+    public void save(@NotNull User user) {
+        checkConnection();
+        if (!isConnected()) return;
+
+        PreparedStatement statement = connection.prepareStatement(UPDATE);
+        try {
+            statement.setInt(1, user.getWins());
+            statement.setBoolean(2, user.isToggled());
+            statement.setString(3, user.getUuid().toString());
+        } catch (Exception ignored) {}
+        update(statement);
+        cache.remove(user.getUuid());
+    }
+
+    /**
+     * Queries if a player is stored in database
+     *
+     * @param uuid player uuid
+     * @return if player is stored in database
+     */
+    @SneakyThrows
+    public boolean isStored(UUID uuid) {
+        checkConnection();
+        ResultSet resultSet = query("SELECT * FROM chatgame_players WHERE uuid= '" + uuid.toString() + "'").get();
+
+        if (resultSet != null)
+            try {
+                if (resultSet.next())
+                    return (resultSet.getString("uuid") != null);
+            } catch (SQLException throwable) {
+                throwable.printStackTrace();
+            }
+        return false;
+    }
 
     /**
      * Checks connection
-     *
      */
-    protected void checkConnection() {
-        execute(connection, "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `name` varchar(16) NOT NULL, `wins` int NOT NULL, PRIMARY KEY (`uuid`))");
+    @SneakyThrows
+    public boolean checkConnection() {
+        if (connection == null || connection.isClosed()) {
+            connection = getNewConnection();
+
+            if (connection == null || connection.isClosed()) {
+                return false;
+            }
+            execute(connection, CREATE_IF_NOT_EXIST);
+        }
+        return true;
     }
 
     /**
      * disconnects from the database
+     * does this need to be done async?
      */
     public void shutdown() {
-
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException ignored) {
+            }
+        }
     }
-
-    /**
-     * Run asynchronous tasks
-     * <br>
-     * <b>All database queries and updates must be asynchronous</b>
-     */
-    protected void async(final @NotNull Runnable runnable) {
-        plugin.async(runnable);
-    }
-
 
     /**
      * Updates table
@@ -112,12 +196,12 @@ public abstract class Database {
      * @param query      query to execute
      */
     @SneakyThrows
-    protected void execute(Connection connection, String query) {
+    public void execute(Connection connection, String query) {
         connection.createStatement().execute(query);
     }
 
     /**
-     * Query the database
+     * Query the database asynchronously
      *
      * @param qry query to run
      * @return {@link CompletableFuture} of the {@link ResultSet}

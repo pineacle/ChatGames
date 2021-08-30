@@ -3,7 +3,6 @@ package me.pineacle.chatgames.API.game;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface Game {
 
@@ -19,6 +18,6 @@ public interface Game {
 
     String getGameName();
 
-    void giveReward(Player player, Optional<String> elapsed);
+    void giveReward(Player player, String elapsed, String answer);
 
 }
