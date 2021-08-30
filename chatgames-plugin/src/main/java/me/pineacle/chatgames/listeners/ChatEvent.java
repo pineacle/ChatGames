@@ -40,7 +40,6 @@ public class ChatEvent implements Listener {
 
                 // prepare events
                 AsyncQuestionAnswerEvent questionAnswerEvent = new AsyncQuestionAnswerEvent(game, gameManager.getActive().get(game));
-                Bukkit.getPluginManager().callEvent(questionAnswerEvent);
 
                 if (game.getCaseSensitive()) {
                     if (questionAnswerEvent.getQuestion().getAnswers().stream().anyMatch(s -> s.equals(message))) {
@@ -56,6 +55,7 @@ public class ChatEvent implements Listener {
     }
 
     private void handleCorrect(Player winner, AsyncPlayerChatEvent e, AsyncQuestionAnswerEvent questionAnswerEvent) {
+        Bukkit.getPluginManager().callEvent(questionAnswerEvent);
         if (questionAnswerEvent.isCancelled()) return;
 
         User user = plugin.getDatabase().getCache().get(winner.getUniqueId());
