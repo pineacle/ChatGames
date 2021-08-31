@@ -56,6 +56,7 @@ public class HelpCommand extends SubCommand {
                     help.add(ChatColor.YELLOW + tutLine);
                 }
 
+                if (!sender.hasPermission(subCommand.getPermission())) continue;
                 ((Player) sender).spigot().sendMessage(new ComponentBuilder(usage)
                         .color(ChatColor.GREEN)
                         .event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, usage))

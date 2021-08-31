@@ -82,7 +82,6 @@ public abstract class Database {
      * @param uuid {@link UUID} of the player
      */
     public void create(@NotNull UUID uuid) {
-        //checkConnection();
         if (!isConnected()) return;
         try {
             PreparedStatement statement = connection.prepareStatement(INSERT);
@@ -105,7 +104,6 @@ public abstract class Database {
      */
     @SneakyThrows
     public void save(@NotNull User user) {
-        //checkConnection();
         if (!isConnected()) return;
 
         PreparedStatement statement = connection.prepareStatement(UPDATE);
@@ -127,7 +125,6 @@ public abstract class Database {
      */
     @SneakyThrows
     public boolean isStored(UUID uuid) {
-        //checkConnection();
         ResultSet resultSet = query("SELECT * FROM chatgame_players WHERE uuid= '" + uuid.toString() + "'").get();
 
         if (resultSet != null)
