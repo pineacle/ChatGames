@@ -57,8 +57,6 @@ public class GameManagerImpl implements GameManager, Loadable {
             questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
                 if (sec.getCounter() == currentQuestion.getGame().getLimit()) {
 
-                    currentQuestion.getGame().getFormat(currentQuestion).get(0);
-
                     currentQuestion.getGame().getExpiredFormat(currentQuestion)
                             .stream()
                             .map(StringUtils::format)

@@ -15,8 +15,8 @@ public final class Cache<user extends User> {
         wrapped.put(uuid, value);
     }
 
-    public void putIfAbsent(Player player, user value) {
-        wrapped.putIfAbsent(player.getUniqueId(), value);
+    public void putIfAbsent(UUID uuid, user value) {
+        wrapped.putIfAbsent(uuid, value);
     }
 
     public void putAll(Map<Player, user> input) {
@@ -25,20 +25,20 @@ public final class Cache<user extends User> {
         wrapped.putAll(values);
     }
 
-    public user get(UUID player) {
-        return wrapped.get(player);
+    public user get(UUID uuid) {
+        return wrapped.get(uuid);
     }
 
-    public user getOrDefault(Player player, user defaultValue) {
-        return wrapped.getOrDefault(player.getUniqueId(), defaultValue);
+    public user getOrDefault(UUID uuid, user defaultValue) {
+        return wrapped.getOrDefault(uuid, defaultValue);
     }
 
     public void remove(UUID uuid) {
         wrapped.remove(uuid);
     }
 
-    public boolean containsKey(Player player) {
-        return wrapped.containsKey(player.getUniqueId());
+    public boolean containsKey(UUID uuid) {
+        return wrapped.containsKey(uuid);
     }
 
     public Collection<user> values() {
