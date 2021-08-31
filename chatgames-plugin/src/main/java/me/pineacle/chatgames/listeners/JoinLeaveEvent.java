@@ -36,8 +36,6 @@ public class JoinLeaveEvent implements Listener {
 
         plugin.async(() -> plugin.getDatabase().save(plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId())));
 
-        plugin.getLogger().info(String.valueOf(Bukkit.getOnlinePlayers().size()));
-
         // Check after a second because OnlinePlayers collection doesn't seem to update right away.
         plugin.syncAfter(() -> {
             if (!plugin.getGameManager().meetsPlayerRequirement()) {

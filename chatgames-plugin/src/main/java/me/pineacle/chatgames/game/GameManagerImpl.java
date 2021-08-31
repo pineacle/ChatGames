@@ -65,7 +65,11 @@ public class GameManagerImpl implements GameManager, Loadable {
                             .collect(Collectors.toList())
 
                             .forEach(line -> Bukkit.getOnlinePlayers()
-                                    .forEach(player -> player.sendMessage(line.replace("{answer}", currentQuestion.getAnswers().get(0)))));
+                                    .forEach(player -> {  // don't send if hidden
+                                        if (!plugin.getDatabase().getCache().get(player.getUniqueId()).isToggled())
+                                            return;
+                                        player.sendMessage(line.replace("{answer}", currentQuestion.getAnswers().get(0)));
+                                    }));
                     plugin.cancelTask(questionTask.getAssignedTaskId());
                     questionTask = null;
                 }

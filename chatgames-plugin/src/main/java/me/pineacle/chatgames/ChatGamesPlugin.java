@@ -10,6 +10,7 @@ import me.pineacle.chatgames.listeners.JoinLeaveEvent;
 import me.pineacle.chatgames.storage.config.Config;
 import me.pineacle.chatgames.storage.config.Language;
 import me.pineacle.chatgames.storage.database.Database;
+import me.pineacle.chatgames.storage.database.mysql.MySQL;
 import me.pineacle.chatgames.storage.database.sqlite.SQLite;
 import me.pineacle.chatgames.user.UserManagerImpl;
 import net.milkbowl.vault.economy.Economy;
@@ -88,6 +89,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
             this.database = new SQLite(this);
         } else {
             // mysql
+            this.database = new MySQL(this);
         }
 
         database.getNewConnection();

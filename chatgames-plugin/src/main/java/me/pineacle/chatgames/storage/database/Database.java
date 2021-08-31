@@ -23,7 +23,7 @@ public abstract class Database {
     private Connection connection;
 
     /* Queries */
-    private final String CREATE_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `wins` int NOT NULL, `toggled` boolean NOT NULL DEFAULT 'false', PRIMARY KEY (`uuid`))";
+    private final String CREATE_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `wins` int NOT NULL, `toggled` boolean NOT NULL DEFAULT false, PRIMARY KEY (`uuid`))";
     private final String INSERT = "INSERT INTO chatgame_players VALUES(?,?,?)";
     private final String UPDATE = "UPDATE chatgame_players SET wins=?, toggled=? WHERE uuid=?";
 
