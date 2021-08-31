@@ -52,13 +52,6 @@ public class GameManagerImpl implements GameManager, Loadable {
      */
     public void startGames() {
 
-        if (!isToggled())
-            return;
-
-        if (!meetsPlayerRequirement()) {
-            return;
-        }
-
         gameSchedulerTask = plugin.syncRepeating(() -> {
             Question currentQuestion = pickQuestion(Optional.empty());
             questionTask = new QuestionTask(currentQuestion.getGame(), currentQuestion, plugin, sec -> {
@@ -80,7 +73,6 @@ public class GameManagerImpl implements GameManager, Loadable {
             questionTask.ask();
             questionTask.scheduleTimer();
         }, 0L, plugin.getGameConfig().getConfiguration().getInt("game.game-gap") * 20 * 60);
-
     }
 
     /**
@@ -104,7 +96,6 @@ public class GameManagerImpl implements GameManager, Loadable {
      */
     @Override
     public Question pickQuestion(Optional<Game> game) {
-
         // pick random game from game pool
         Game currentGame = game.orElse(gamePool.get(ThreadLocalRandom.current().nextInt(gamePool.size())));
 
@@ -113,7 +104,7 @@ public class GameManagerImpl implements GameManager, Loadable {
 
         // if repeat question, reroll
         if (!active.isEmpty() && active.containsValue(picked)) {
-            return pickQuestion(Optional.empty());
+            return pickQuestion(game);
         }
 
         // set the active Game and Question
@@ -160,7 +151,7 @@ public class GameManagerImpl implements GameManager, Loadable {
                 new MathGame(plugin),
                 new RandomSequenceGame(plugin));
 
-        games.forEach(game -> register(game));
+        games.forEach(this::register);
 
     }
 

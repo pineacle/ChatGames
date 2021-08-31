@@ -45,7 +45,7 @@ public class StatsCommand extends SubCommand {
                 .stream()
                 .map(StringUtils::format)
                 .collect(Collectors.toList())
-                .forEach(line -> player.sendMessage(line.replace("{wins}", String.valueOf(user.getWins()))
+                .forEach(line -> player.sendMessage(line.replace("{wins}", String.valueOf(user.getWins())).replace("{game_status}", plugin.getGameManager().isToggled() ? "active" : "not active")
                         .replace("{status}", !user.isToggled() ? "hidden" : "visible")));
     }
 

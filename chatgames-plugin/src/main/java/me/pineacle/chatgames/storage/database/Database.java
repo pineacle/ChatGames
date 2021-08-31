@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class Database {
 
     protected final ChatGamesPlugin plugin;
-    @Getter private final Cache<User> cache;
+    @Getter private final Cache<UserImpl> cache;
 
     private Connection connection;
 
@@ -30,15 +30,9 @@ public abstract class Database {
     protected Database(final ChatGamesPlugin plugin) {
         this.plugin = plugin;
         this.cache = new Cache();
-        plugin.asyncRepeating(() -> {
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.createStatement().execute("/* ping */ SELECT 1");
-                }
-            } catch (SQLException e) {
-                connection = getNewConnection();
-            }
-        }, 60 * 20, 60 * 20);
+        connection = getNewConnection();
+        if (isConnected())
+            execute(connection, CREATE_IF_NOT_EXIST);
     }
 
     /**
@@ -51,7 +45,9 @@ public abstract class Database {
     /**
      * Returns if a connection is established
      */
-    public abstract boolean isConnected();
+    public boolean isConnected() {
+        return connection != null;
+    }
 
     /**
      * Requests User data from the database and stores to cache
@@ -61,14 +57,13 @@ public abstract class Database {
      * @throws UnavailableUserException if no user found
      */
     public User request(@NotNull UUID uuid) {
-        checkConnection();
         if (!isConnected())
             throw new UnavailableUserException("Unable to fetch player data because database is not connected.");
 
         query("SELECT * FROM `chatgame_players` WHERE uuid='" + uuid + "'").thenApply(resultSet -> {
             try {
                 if (resultSet.next()) {
-                    User user = new UserImpl(UUID.fromString(resultSet.getString(1)), resultSet.getInt(2), resultSet.getBoolean(3));
+                    UserImpl user = new UserImpl(UUID.fromString(resultSet.getString(1)), resultSet.getInt(2), resultSet.getBoolean(3));
                     cache.put(uuid, user);
                     return user;
                 }
@@ -87,7 +82,7 @@ public abstract class Database {
      * @param uuid {@link UUID} of the player
      */
     public void create(@NotNull UUID uuid) {
-        checkConnection();
+        //checkConnection();
         if (!isConnected()) return;
         try {
             PreparedStatement statement = connection.prepareStatement(INSERT);
@@ -110,7 +105,7 @@ public abstract class Database {
      */
     @SneakyThrows
     public void save(@NotNull User user) {
-        checkConnection();
+        //checkConnection();
         if (!isConnected()) return;
 
         PreparedStatement statement = connection.prepareStatement(UPDATE);
@@ -118,7 +113,8 @@ public abstract class Database {
             statement.setInt(1, user.getWins());
             statement.setBoolean(2, user.isToggled());
             statement.setString(3, user.getUuid().toString());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         update(statement);
         cache.remove(user.getUuid());
     }
@@ -131,7 +127,7 @@ public abstract class Database {
      */
     @SneakyThrows
     public boolean isStored(UUID uuid) {
-        checkConnection();
+        //checkConnection();
         ResultSet resultSet = query("SELECT * FROM chatgame_players WHERE uuid= '" + uuid.toString() + "'").get();
 
         if (resultSet != null)
@@ -142,22 +138,6 @@ public abstract class Database {
                 throwable.printStackTrace();
             }
         return false;
-    }
-
-    /**
-     * Checks connection
-     */
-    @SneakyThrows
-    public boolean checkConnection() {
-        if (connection == null || connection.isClosed()) {
-            connection = getNewConnection();
-
-            if (connection == null || connection.isClosed()) {
-                return false;
-            }
-            execute(connection, CREATE_IF_NOT_EXIST);
-        }
-        return true;
     }
 
     /**
@@ -211,7 +191,7 @@ public abstract class Database {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                PreparedStatement ps = getNewConnection().prepareStatement(qry);
+                PreparedStatement ps = connection.prepareStatement(qry);
                 return ps.executeQuery();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();

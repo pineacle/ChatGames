@@ -29,6 +29,7 @@ public class SQLite extends Database {
         }
         try {
             Class.forName("org.sqlite.JDBC");
+
             return DriverManager.getConnection("jdbc:sqlite:" + dataFolder.getAbsolutePath());
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -36,9 +37,5 @@ public class SQLite extends Database {
         return null;
     }
 
-    @Override
-    public boolean isConnected() {
-        return getNewConnection() != null;
-    }
 
 }

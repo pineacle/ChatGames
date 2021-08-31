@@ -2,6 +2,7 @@ package me.pineacle.chatgames.listeners;
 
 import lombok.RequiredArgsConstructor;
 import me.pineacle.chatgames.ChatGamesPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -22,30 +23,30 @@ public class JoinLeaveEvent implements Listener {
             plugin.getDatabase().create(e.getPlayer().getUniqueId());
         }
 
-        if (!plugin.getGameManager().isToggled())
-            return;
-        else {
-            if (plugin.getGameManager().meetsPlayerRequirement()) {
-                if (plugin.getGameManager().getGameSchedulerTask() != null) {
-                    plugin.getGameManager().startGames();
-                }
+        if (plugin.getGameManager().meetsPlayerRequirement()) {
+            if (plugin.getGameManager().getGameSchedulerTask() == null) {
+                plugin.getGameManager().startGames();
             }
         }
+
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
 
-        if (plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId()) != null) {
-            plugin.async(() -> plugin.getDatabase().save(plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId())));
-        }
+        plugin.async(() -> plugin.getDatabase().save(plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId())));
 
-        if (!plugin.getGameManager().meetsPlayerRequirement()) {
-            if (plugin.getGameManager().getGameSchedulerTask() != null) {
-                plugin.getGameManager().stopGames();
-                plugin.getLogger().info("Player requirement has been lost, stopping games.");
+        plugin.getLogger().info(String.valueOf(Bukkit.getOnlinePlayers().size()));
+
+        // Check after a second because OnlinePlayers collection doesn't seem to update right away.
+        plugin.syncAfter(() -> {
+            if (!plugin.getGameManager().meetsPlayerRequirement()) {
+                if (plugin.getGameManager().getGameSchedulerTask() != null) {
+                    plugin.getLogger().info("Player requirement has been lost, stopping games..");
+                    plugin.getGameManager().stopGames();
+                }
             }
-        }
+        }, 20L);
     }
 
 }

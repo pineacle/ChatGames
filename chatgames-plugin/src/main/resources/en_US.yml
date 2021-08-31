@@ -7,5 +7,6 @@ stats-format:
   - ""
   - "&6&lCHATGAMES"
   - "&eWins: &7{wins}"
-  - "&eStatus: &7{status}"
+  - "&eVisibility: &7{status}"
+  - "&eGame Status: &7{game_status}"
   - ""
