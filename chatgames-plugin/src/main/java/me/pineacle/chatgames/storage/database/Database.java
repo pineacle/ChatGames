@@ -32,7 +32,7 @@ public abstract class Database {
         this.cache = new Cache();
         connection = getNewConnection();
         if (isConnected())
-            execute(connection, CREATE_IF_NOT_EXIST);
+            plugin.async(() -> execute(connection, CREATE_IF_NOT_EXIST));
     }
 
     /**
