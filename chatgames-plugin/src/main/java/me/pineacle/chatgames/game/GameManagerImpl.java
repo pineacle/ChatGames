@@ -151,6 +151,7 @@ public class GameManagerImpl implements GameManager, Loadable {
                 new UnscrambleGame(plugin),
                 new ReverseGame(plugin),
                 new MathGame(plugin),
+                new DecipherGame(plugin),
                 new RandomSequenceGame(plugin));
 
         games.forEach(this::register);

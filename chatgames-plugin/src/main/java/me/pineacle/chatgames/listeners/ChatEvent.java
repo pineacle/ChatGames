@@ -58,9 +58,7 @@ public class ChatEvent implements Listener {
         Bukkit.getPluginManager().callEvent(questionAnswerEvent);
         if (questionAnswerEvent.isCancelled()) return;
 
-        User user = plugin.getDatabase().getCache().get(winner.getUniqueId());
-
-        user.setWins(user.getWins() + 1);
+        plugin.getUserManager().addWin(winner.getUniqueId(), 1);
 
         long start = gameManager.getQuestionTask().getStart();
         long finish = System.currentTimeMillis();
