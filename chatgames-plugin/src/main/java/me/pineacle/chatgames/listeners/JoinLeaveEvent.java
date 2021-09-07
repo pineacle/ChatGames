@@ -2,7 +2,6 @@ package me.pineacle.chatgames.listeners;
 
 import lombok.RequiredArgsConstructor;
 import me.pineacle.chatgames.ChatGamesPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -34,7 +33,10 @@ public class JoinLeaveEvent implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
 
-        plugin.async(() -> plugin.getDatabase().save(plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId())));
+        plugin.async(() -> {
+            if (plugin.getDatabase().isStored(e.getPlayer().getUniqueId()))
+                plugin.getDatabase().save(plugin.getDatabase().getCache().get(e.getPlayer().getUniqueId()));
+        });
 
         // Check after a second because OnlinePlayers collection doesn't seem to update right away.
         plugin.syncAfter(() -> {

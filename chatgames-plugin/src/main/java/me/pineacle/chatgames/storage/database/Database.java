@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import me.pineacle.chatgames.API.user.User;
 import me.pineacle.chatgames.ChatGamesPlugin;
+import me.pineacle.chatgames.storage.database.tasks.UpdateTask;
 import me.pineacle.chatgames.user.UserImpl;
-import me.pineacle.chatgames.utils.exeptions.UnavailableUserException;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,19 +20,24 @@ public abstract class Database {
     protected final ChatGamesPlugin plugin;
     @Getter private final Cache<UserImpl> cache;
 
-    private Connection connection;
+    @Getter private final Connection connection;
 
     /* Queries */
-    private final String CREATE_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `wins` int NOT NULL, `toggled` boolean NOT NULL DEFAULT false, PRIMARY KEY (`uuid`))";
-    private final String INSERT = "INSERT INTO chatgame_players VALUES(?,?,?)";
-    private final String UPDATE = "UPDATE chatgame_players SET wins=?, toggled=? WHERE uuid=?";
+    public final String CREATE_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_players` (`uuid` varchar(64) NOT NULL, `wins` int NOT NULL, `toggled` boolean NOT NULL DEFAULT false, PRIMARY KEY (`uuid`))";
+    public final String CREATE_CONFIG_IF_NOT_EXIST = "CREATE TABLE IF NOT EXISTS `chatgame_config` (`setting` varchar(16) NOT NULL, `value` varchar(200) NOT NULL, PRIMARY KEY (`setting`))"; // to check for updates
+
+    public final String INSERT = "INSERT INTO `chatgame_players` VALUES(?,?,?)";
+    public final String UPDATE = "UPDATE `chatgame_players` SET wins=?, toggled=? WHERE uuid=?";
 
     protected Database(final ChatGamesPlugin plugin) {
         this.plugin = plugin;
-        this.cache = new Cache();
+        this.cache = new Cache<>();
         connection = getNewConnection();
-        if (isConnected())
-            plugin.async(() -> execute(connection, CREATE_IF_NOT_EXIST));
+        if (isConnected()) {
+            plugin.async(() -> {
+            });
+            new UpdateTask(this).runTaskAsynchronously(plugin);
+        }
     }
 
     /**
@@ -53,13 +58,9 @@ public abstract class Database {
      * Requests User data from the database and stores to cache
      *
      * @param uuid {@link UUID} of the player
-     * @return boolean if request was successful
-     * @throws UnavailableUserException if no user found
      */
-    public User request(@NotNull UUID uuid) {
-        if (!isConnected())
-            throw new UnavailableUserException("Unable to fetch player data because database is not connected.");
-
+    public void request(UUID uuid) {
+        Objects.requireNonNull(uuid, "UUID cannot be null");
         query("SELECT * FROM `chatgame_players` WHERE uuid='" + uuid + "'").thenApply(resultSet -> {
             try {
                 if (resultSet.next()) {
@@ -73,7 +74,6 @@ public abstract class Database {
             return null;
         });
 
-        return null;
     }
 
     /**
@@ -81,8 +81,8 @@ public abstract class Database {
      *
      * @param uuid {@link UUID} of the player
      */
-    public void create(@NotNull UUID uuid) {
-        if (!isConnected()) return;
+    public void create(UUID uuid) {
+        Objects.requireNonNull(uuid, "UUID cannot be null");
         try {
             PreparedStatement statement = connection.prepareStatement(INSERT);
             statement.setString(1, uuid.toString()); // uuid
@@ -96,16 +96,14 @@ public abstract class Database {
             UserImpl user = new UserImpl(uuid, 0, true);
             cache.put(uuid, user);
         }
-        return;
     }
 
     /**
      * Save users data from the cache
      */
     @SneakyThrows
-    public void save(@NotNull User user) {
-        if (!isConnected()) return;
-
+    public void save(User user) {
+        Objects.requireNonNull(user, "User cannot be null");
         PreparedStatement statement = connection.prepareStatement(UPDATE);
         try {
             statement.setInt(1, user.getWins());
@@ -125,6 +123,8 @@ public abstract class Database {
      */
     @SneakyThrows
     public boolean isStored(UUID uuid) {
+        if(!isConnected()) throw new SQLException("Database was not able to connect, and therefore cannot process request.");
+
         ResultSet resultSet = query("SELECT * FROM chatgame_players WHERE uuid= '" + uuid.toString() + "'").get();
 
         if (resultSet != null)
