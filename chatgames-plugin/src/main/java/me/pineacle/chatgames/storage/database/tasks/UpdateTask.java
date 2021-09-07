@@ -1,6 +1,7 @@
 package me.pineacle.chatgames.storage.database.tasks;
 
 import lombok.AllArgsConstructor;
+import me.pineacle.chatgames.ChatGamesPlugin;
 import me.pineacle.chatgames.storage.database.Database;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -13,15 +14,15 @@ import java.sql.SQLException;
 public class UpdateTask extends BukkitRunnable {
 
     private final Database database;
+    private final ChatGamesPlugin plugin;
 
     private final int DATABASE_VERSION = 1;
 
     @Override
     public void run() {
-        if (!database.isConnected()) return;
-        int version = getDatabaseVersion(database.getConnection());
-
         createTables();
+
+        int version = getDatabaseVersion(database.getConnection());
 
         // todo: handle future updates here
 
@@ -60,10 +61,10 @@ public class UpdateTask extends BukkitRunnable {
      * @param currentVersion returns the database version
      */
     private void setDatabaseVersion(Connection connection, int currentVersion) {
-        try (PreparedStatement select = connection.prepareStatement("INSERT INTO `chatgame_config` VALUES('version', ?) ON DUPLICATE KEY UPDATE `value`=?")) {
+        try (PreparedStatement select = plugin.isUsingMySQL() ? connection.prepareStatement("INSERT INTO `chatgame_config` VALUES('version', ?) ON DUPLICATE KEY UPDATE `value`=?") : connection.prepareStatement("INSERT OR REPLACE INTO `chatgame_config` (setting, value) VALUES('version', ?)")) {
             select.setInt(1, currentVersion);
-            select.setInt(2, currentVersion);
-            select.execute();
+            if (plugin.isUsingMySQL()) select.setInt(2, currentVersion);
+            select.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

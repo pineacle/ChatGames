@@ -25,24 +25,27 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.Objects;
 
+@Getter
 public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
 
-    @Getter private static ChatGamesPlugin instance;
+    private static ChatGamesPlugin instance;
 
-    @Getter private Economy economy = null;
-    @Getter private boolean usingVault = false;
+    private Economy economy = null;
+    private boolean usingVault = false;
 
-    @Getter private UserManagerImpl userManager;
-    @Getter private GameManagerImpl gameManager;
-    @Getter private GameRegistry gameRegistry;
+    private UserManagerImpl userManager;
+    private GameManagerImpl gameManager;
+    private GameRegistry gameRegistry;
 
-    @Getter private CommandHandler commandHandler;
+    private CommandHandler commandHandler;
 
-    @Getter private Config gameConfig;
-    @Getter private Language language;
-    @Getter private FileConfiguration words;
+    private Config gameConfig;
+    private Language language;
+    private FileConfiguration words;
 
-    @Getter private Database database;
+    private Database database;
+
+    private boolean usingMySQL;
 
     @Override
     public void onEnable() {
@@ -66,7 +69,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
 
         Bukkit.getServer().getPluginManager().registerEvents(new ChatEvent(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new JoinLeaveEvent(this), this);
-        getCommand("chatgames").setExecutor(commandHandler = new CommandHandler(this));
+        Objects.requireNonNull(getCommand("chatgames")).setExecutor(commandHandler = new CommandHandler(this));
 
         if (setupEconomy()) usingVault = true;
 
@@ -83,7 +86,7 @@ public final class ChatGamesPlugin extends JavaPlugin implements ChatGames {
     }
 
     public void setupDatabase() {
-        boolean usingMySQL = getConfig().getBoolean("settings.use-mysql");
+        usingMySQL = getConfig().getBoolean("settings.use-mysql");
 
         if (!usingMySQL) {
             this.database = new SQLite(this);

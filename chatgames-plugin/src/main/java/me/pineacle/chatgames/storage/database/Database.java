@@ -34,7 +34,7 @@ public abstract class Database {
         this.cache = new Cache<>();
         connection = getNewConnection();
         if (isConnected()) {
-            new UpdateTask(this).runTaskAsynchronously(plugin);
+            new UpdateTask(this, plugin).runTaskAsynchronously(plugin);
         }
     }
 
