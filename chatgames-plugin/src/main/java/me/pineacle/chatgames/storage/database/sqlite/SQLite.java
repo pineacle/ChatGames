@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class SQLite extends Database {
 
@@ -30,8 +31,20 @@ public class SQLite extends Database {
         try {
             Class.forName("org.sqlite.JDBC");
 
-            return DriverManager.getConnection("jdbc:sqlite:" + dataFolder.getAbsolutePath());
-        } catch (SQLException | ClassNotFoundException e) {
+            CompletableFuture<Connection> conFuture = CompletableFuture.supplyAsync(() -> {
+
+                try {
+                    return DriverManager.getConnection("jdbc:sqlite:" + dataFolder.getAbsolutePath());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            });
+
+            return conFuture.get();
+
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
